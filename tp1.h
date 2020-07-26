@@ -1,5 +1,6 @@
 #ifndef _tp1_h_
 #define _tp1_h_
+
 typedef struct {
     float *v;
     size_t n;

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "tp1.h"
+#include "modulacion.h"
 #define NOMBRE_MAX 255; //longitud maxima de nombres de archivos permitido en Linux
 
 int main(int argc, char* argv[]){

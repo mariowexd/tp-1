@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdbool.h>
 #include "tp1.h"
+#include "modulacion.h"
+
 #define NOMBRE_MAX 255
 #define CANT_ARG 6
 #define CANT_ARG_TXT 3
@@ -71,8 +73,9 @@ armo_t *tomarArmonicos(char *nombre){
 
     armo_t *armos = malloc(sizeof(armo_t));
     armos->v = malloc(naux*sizeof(float));
+
     armos->n = naux;
-    char aux2[10];
+    char aux2[CANT_CHAR_RENGLON];
     size_t cant_chars = 0;
     for(size_t x=0; x<naux; x++){
         cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
@@ -88,3 +91,4 @@ void destruirArmonicos(armo_t *armos){
     free(armos->v);
     free(armos);
 }
+
