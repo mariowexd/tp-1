@@ -8,8 +8,9 @@
 #define CANT_ARG 6
 #define CANT_ARG_TXT 3
 #define ARG_MAX 12
-/*/sintetizador -s <sintetizador.txt> -i <entrada.mid> -o <salida.wav> [-c <canal>] [-f <frecuencia>] [-r <pulsosporsegundo>]
-*/
+#define CANT_CHAR_RENGLON 10
+#define CANT_ARM_MAX 4
+
 bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_t *c, int *f, int *r)
 {
     if (n > ARG_MAX)
@@ -54,4 +55,36 @@ bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_
     if (lecturas[0] == false || lecturas[1] == false || lecturas[2] == false)
         return false;
     return true;
+}
+
+armo_t *tomarArmonicos(char *nombre){
+    FILE *archivo = fopen(nombre, "rt");
+    if (archivo==NULL){
+        printf("Archivo sintetizador no encontrado");
+        return NULL;
+    }
+
+    size_t naux = 0;
+    char aux1[CANT_ARM_MAX];
+    fgets(aux1, CANT_ARM_MAX, archivo);
+    naux = atoi(aux1);
+
+    armo_t *armos = malloc(sizeof(armo_t));
+    armos->v = malloc(naux*sizeof(float));
+    armos->n = naux;
+    char aux2[10];
+    size_t cant_chars = 0;
+    for(size_t x=0; x<naux; x++){
+        cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
+        fgets(aux2, cant_chars, archivo);
+        armos->v[x] = atof(aux2+2);
+        printf("%f\n", armos->v[x]);
+    }
+    fclose(archivo);
+    return armos;
+}
+
+void destruirArmonicos(armo_t *armos){
+    free(armos->v);
+    free(armos);
 }

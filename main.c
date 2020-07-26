@@ -17,9 +17,9 @@ int main(int argc, char* argv[]){
     bool k = tomarArgumentos(argc, argv, nombre_txt, nombre_mid, nombre_wav, &canal, &frec_muestreo, &pulsos_p_segundo);
     if (k==false) return 1;
 
-    printf("El nombre del txt es %s\nEl nombre del mid es %s\nEl nombre del wav es %s\nEl canal es%lu\nLa frec es %d\nLos pps son %d",
-            nombre_txt, nombre_mid, nombre_wav, canal, frec_muestreo, pulsos_p_segundo); //Para probar que tomarArgumentos anda ok
+    armo_t *armonicos = tomarArmonicos(nombre_txt);
+    if (armonicos==NULL) return 1;
 
-
+    destruirArmonicos(armonicos);
     return 0;
 }
