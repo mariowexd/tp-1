@@ -87,6 +87,13 @@ armo_t *tomarArmonicos(char *nombre){
     return armos;
 }
 
+void destruirNotas(nota_t notas){
+    free(notas->t0);
+    free(notas->tf);
+    free(notas->a);
+    free(notas->ff);
+    free(notas);
+}
 void destruirArmonicos(armo_t *armos){
     free(armos->v);
     free(armos);
