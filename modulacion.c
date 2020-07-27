@@ -50,7 +50,7 @@ float mTri(double t, float params[3]) {
     else if(t>params[1]){
         return (t-params[1])/(params[1]-params[0])*(params[2]-1)+params[2];
     }
-    else return 0; //NI IDEA QUE PASARIA EN CASO DE QUE TANTO T1 Y T SEAN IGUALES
+    else return 0; ///NI IDEA QUE PASARIA EN CASO DE QUE TANTO T1 Y T SEAN IGUALES
 }
 float mPulses(double t, float params[3]) {
     float tPrima = t/params[0] - fabs(t/params[0]);
