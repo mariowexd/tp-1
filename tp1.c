@@ -7,6 +7,13 @@
 #define CANT_CHAR_RENGLON 10
 #define CANT_ARM_MAX 4
 
+#define METAEVENTO_FIN_DE_PISTA 0x2F
+#define EVENTO_MAX_LONG 10
+
+enum {EVNOTA_NOTA, EVNOTA_VELOCIDAD};
+
+enum {METAEVENTO_TIPO, METAEVENTO_LONGITUD};
+
 bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_t *c, int *f, int *r)
 {
     if (n > ARG_MAX)
@@ -97,26 +104,31 @@ armo_t *tomarArmonicos(char *nombre){
 }
 
 notas_t tomarNotas(char *nombre_mid){
-    notas_t *notas;
-    //Leo encabezado
-    formato_t formato;
-    uint16_t numero_pistas;
-    uint16_t pulsos_negra;
-    
     FILE *f = fopen(nombre, "rb");
     if (archivo==NULL){
         printf("Archivo sintetizador no encontrado");
         return NULL;
     }
-    
-    if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra))
+
+    notas_t *notas;
+    //Leo encabezado
+    formato_t formato;
+    uint16_t numero_pistas;
+    uint16_t pulsos_negra;
+        
+    if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra)){
+        fprintf(stderr, "Fallo lectura encabezado\n");
+        fclose(f);
         return NULL;
-    
+    }
     //Leo e itero las pistas
     for(uint16_t pista = 0; pista < numero_pistas; pista++) {
         uint32_t tamagno_pista;
-        if(! leer_pista(f, &tamagno_pista))
+        if(! leer_pista(f, &tamagno_pista)){
+            fprintf(stderr, "Fallo lectura pista\n");
+            fclose(f);
             return NULL;
+        }
         //Leo los evetos
         evento_t evento;
         char canal;
@@ -124,36 +136,50 @@ notas_t tomarNotas(char *nombre_mid){
         uint32_t tiempo;
         
         while(1) {
-            //iterador (lo incrementamos al final del ciclo)
-            size_t i = 0;
-            //incremento n va de la mano con i
-            notas.n[i] += 1; //NO, NOTAS ES UN PUNTERO IRIA ASI notas->n+=1 APARTE N NO ES UN PUNTERO FIJATE
             //Guardo el tiempo
             uint32_t delta_tiempo;
             leer_tiempo(f, &delta_tiempo);
             tiempo += delta_tiempo;
       
-            if(! leer_evento(f, &evento, &canal, &longitud, buffer))
+            if(! leer_evento(f, &evento, &canal, &longitud, buffer)){
+                fprintf(stderr, "Error leyendo evento\n");
+                fclose(f);
                 return NULL;
+            }
 
             else if(evento == METAEVENTO && canal == 0xF) {
                 if(buffer[METAEVENTO_TIPO] == METAEVENTO_FIN_DE_PISTA)
                     break;
                 descartar_metaevento(f, buffer[METAEVENTO_LONGITUD]);
             }
-
-            else if(evento == NOTA_ENCENDIDA){
-                notas.t0[i] = tiempo;
-                size_t l = i;
+            else if(evento == NOTA_ENCENDIDA || evento == NOTA_APAGADA) {
+                nota_t nota;
+                signed char octava;
+                
+                if(! decodificar_nota(buffer[EVNOTA_NOTA], &nota, &octava)) {
+                    fprintf(stderr, "Error leyendo nota\n");
+                    fclose(f);
+                    return NULL;
+                }
+                
+                size_t i = 0;    
+                size_t r = 0;
+                size_t *l;
+                if(evento == NOTA_ENCENDIDA){
+                    notas.t0[i] = tiempo;
+                    notas.ff[i] = tomarFrecuencia(nota, octaba);
+                    notas.a[i] = 1;// Averiguar si no esta relacionado con buffer[EVNOTA_VELOCIDAD]
+                    l[i] = i;
+                    notas->n += 1;
+                    i++;
+                }
+                else if(evento == NOTA_APAGADA ||(evento == NOTA_ENCENDIDA && buffer[EVNOTA_VELOCIDAD] == 0)){
+                    notas.tf[l[r]] = tiempo - notas.t0[l[r]];
+                    r++;
+                }
             }
-            
-            else if(evento == NOTA_APAGADA)
-                notas.tf[l] = tiempo - notas.t0[l];
 
-            
-
-        }
-
-    } 
+        } 
     fclose(f);
+    return notas;
 }

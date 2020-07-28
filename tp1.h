@@ -21,7 +21,15 @@ typedef struct {
     float *a;
     int *ff; //frecuencia fundamental
     size_t n;
-} notas_t
+}notas_t;
+
+//TDA SINTETIZADOR
+typedef struct{
+}sintetizador_t;
+
+//TDA MUESTRAS
+typedef struct{
+}muestras_t;
 
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
