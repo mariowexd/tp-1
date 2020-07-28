@@ -4,6 +4,7 @@
 #include "modulacion.h"
 #define E 2.718281
 #define PI 3.141592 
+
 //******FUNCIONES DE MODULACION:********//
 float mConstant(double t, float params[3]) {
     return 1;

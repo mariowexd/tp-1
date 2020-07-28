@@ -99,3 +99,37 @@ void destruirArmonicos(armo_t *armos){
     free(armos);
 }
 
+notas_t tomarNotas(FILE *f){
+    notas_t *notas;
+    //Leo encabezado
+    formato_t formato;
+    uint16_t numero_pistas;
+    uint16_t pulsos_negra;
+    if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra))
+        return NULL;
+    
+    //Leo e itero las pistas
+    for(uint16_t pista = 0; pista < numero_pistas; pista++) {
+        uint32_t tamagno_pista;
+        if(! leer_pista(f, &tamagno_pista))
+            return NULL;
+        
+        evento_t evento;
+        char canal;
+        int longitud;
+        uint32_t tiempo = 0;
+        
+        while(1) {
+            leer_tiempo(f, &notas.t0);
+            if(! leer_evento(f, &evento, &canal, &longitud, buffer))
+                return NULL;
+            
+            else if(evento == NOTA_ENCENDIDA)
+                size_t i = 0;
+                notas->
+            
+        }
+    } 
+    
+}
+

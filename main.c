@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
     armo_t *armonicos = tomarArmonicos(nombre_txt);
     if (armonicos==NULL) return 1;
 
-    nota_t *notas = tomarNotas(nombre_mid); //Esta esta por hacer
+    notas_t *notas = tomarNotas(argv[4]); //Esta esta por hacer
 
     destruirNotas(notas);
     destruirArmonicos(armonicos);

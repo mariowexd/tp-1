@@ -13,7 +13,7 @@ typedef struct {
     float *a;
     int *ff; //frecuencia fundamental
     size_t n;
-} nota_t
+} notas_t
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
 armo_t *tomarArmonicos(char *);
