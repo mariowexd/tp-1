@@ -1,5 +1,13 @@
 #ifndef _tp1_h_
 #define _tp1_h_
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdbool.h>
+#include "tp1.h"
+
 //TDA ARMONICOS
 typedef struct {
     float *v;
@@ -15,9 +23,17 @@ typedef struct {
     size_t n;
 } notas_t
 
+
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
-armo_t *tomarArmonicos(char *);
-nota_t *tomarNotas(char *);
+
 void destruirNotas(nota_t *);
+
 void destruirArmonicos(armo_t *);
+
+int tomarFrecuencia(nota_t *, octava);
+
+armo_t *tomarArmonicos(char *);
+
+nota_t *tomarNotas(char *);
+
 #endif

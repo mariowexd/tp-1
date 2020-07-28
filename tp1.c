@@ -1,9 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <stdbool.h>
-#include "tp1.h"
 #include "modulacion.h"
 
 #define NOMBRE_MAX 255
@@ -59,6 +53,21 @@ bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_
     return true;
 }
 
+void destruirNotas(nota_t notas){
+    free(notas->t0);
+    free(notas->tf);
+    free(notas->a);
+    free(notas->ff);
+    free(notas);
+}
+void destruirArmonicos(armo_t *armos){
+    free(armos->v);
+    free(armos);
+}
+
+int tomarFrecuencia(nota_t *, octava){
+}
+
 armo_t *tomarArmonicos(char *nombre){
     FILE *archivo = fopen(nombre, "rt");
     if (archivo==NULL){
@@ -87,18 +96,6 @@ armo_t *tomarArmonicos(char *nombre){
     return armos;
 }
 
-void destruirNotas(nota_t notas){
-    free(notas->t0);
-    free(notas->tf);
-    free(notas->a);
-    free(notas->ff);
-    free(notas);
-}
-void destruirArmonicos(armo_t *armos){
-    free(armos->v);
-    free(armos);
-}
-
 notas_t tomarNotas(FILE *f){
     notas_t *notas;
     //Leo encabezado
@@ -113,23 +110,43 @@ notas_t tomarNotas(FILE *f){
         uint32_t tamagno_pista;
         if(! leer_pista(f, &tamagno_pista))
             return NULL;
-        
+        //Leo los evetos
         evento_t evento;
         char canal;
         int longitud;
-        uint32_t tiempo = 0;
+        uint32_t tiempo;
         
         while(1) {
-            leer_tiempo(f, &notas.t0);
+            //iterador (lo incrementamos al final del ciclo)
+            size_t i = 0;
+            //incremento n va de la mano con i
+            notas.n[i] += 1;
+            //Guardo el tiempo
+            uint32_t delta_tiempo;
+            leer_tiempo(f, &delta_tiempo);
+            tiempo += delta_tiempo;
+      
             if(! leer_evento(f, &evento, &canal, &longitud, buffer))
                 return NULL;
+
+            else if(evento == METAEVENTO && canal == 0xF) {
+                if(buffer[METAEVENTO_TIPO] == METAEVENTO_FIN_DE_PISTA)
+                    break;
+                descartar_metaevento(f, buffer[METAEVENTO_LONGITUD]);
+            }
+
+            else if(evento == NOTA_ENCENDIDA){
+                notas.t0[i] = tiempo;
+                size_t l = i;
+            }
             
-            else if(evento == NOTA_ENCENDIDA)
-                size_t i = 0;
-                notas->
+            else if(evento == NOTA_APAGADA)
+                notas.tf[l] = tiempo - notas.t0[l];
+
             
+
         }
+
     } 
     
 }
-
