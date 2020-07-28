@@ -96,12 +96,19 @@ armo_t *tomarArmonicos(char *nombre){
     return armos;
 }
 
-notas_t tomarNotas(FILE *f){
+notas_t tomarNotas(char *nombre_mid){
     notas_t *notas;
     //Leo encabezado
     formato_t formato;
     uint16_t numero_pistas;
     uint16_t pulsos_negra;
+    
+    FILE *f = fopen(nombre, "rb");
+    if (archivo==NULL){
+        printf("Archivo sintetizador no encontrado");
+        return NULL;
+    }
+    
     if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra))
         return NULL;
     
@@ -120,7 +127,7 @@ notas_t tomarNotas(FILE *f){
             //iterador (lo incrementamos al final del ciclo)
             size_t i = 0;
             //incremento n va de la mano con i
-            notas.n[i] += 1;
+            notas.n[i] += 1; //NO, NOTAS ES UN PUNTERO IRIA ASI notas->n+=1 APARTE N NO ES UN PUNTERO FIJATE
             //Guardo el tiempo
             uint32_t delta_tiempo;
             leer_tiempo(f, &delta_tiempo);
@@ -148,5 +155,5 @@ notas_t tomarNotas(FILE *f){
         }
 
     } 
-    
+    fclose(f);
 }
