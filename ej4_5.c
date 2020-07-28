@@ -1,4 +1,9 @@
-#include "funciones4-5.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include "ej4_5.h"
 
 #define MASK_VALOR_CANAL_EVENTO 0x7f
 #define MASK_EVENTO 0x70

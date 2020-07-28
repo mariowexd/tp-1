@@ -1,11 +1,19 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
 #include "modulacion.h"
-
+#include "ej4_5.h"
 #define NOMBRE_MAX 255
 #define CANT_ARG 6
 #define CANT_ARG_TXT 3
 #define ARG_MAX 12
 #define CANT_CHAR_RENGLON 10
 #define CANT_ARM_MAX 4
+#define LA_4_FREC 440
+#define LA_4_VAL 69
+#define RAIZ_12_2 1.05946309435929
 
 #define METAEVENTO_FIN_DE_PISTA 0x2F
 #define EVENTO_MAX_LONG 10
@@ -72,7 +80,11 @@ void destruirArmonicos(armo_t *armos){
     free(armos);
 }
 
-int tomarFrecuencia(nota_t *, octava){
+int tomarFrecuencia(nota_t nota, int octava){
+    int n = nota+12*(octava+1);
+    n = n - LA_4_VAL;
+    float factor = pow(RAIZ_12_2, n);
+    return LA_4_FREC*factor;
 }
 
 armo_t *tomarArmonicos(char *nombre){
@@ -110,7 +122,7 @@ notas_t tomarNotas(char *nombre_mid){
         return NULL;
     }
 
-    notas_t *notas;
+    notas_t *notas =NULL;
     //Leo encabezado
     formato_t formato;
     uint16_t numero_pistas;
@@ -167,7 +179,7 @@ notas_t tomarNotas(char *nombre_mid){
                 size_t *l;
                 if(evento == NOTA_ENCENDIDA){
                     notas.t0[i] = tiempo;
-                    notas.ff[i] = tomarFrecuencia(nota, octaba);
+                    notas.ff[i] = tomarFrecuencia(nota, octava);
                     notas.a[i] = 1;// Averiguar si no esta relacionado con buffer[EVNOTA_VELOCIDAD]
                     l[i] = i;
                     notas->n += 1;
@@ -179,7 +191,7 @@ notas_t tomarNotas(char *nombre_mid){
                 }
             }
 
-        } 
+        }
     fclose(f);
     return notas;
 }

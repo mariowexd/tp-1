@@ -1,5 +1,5 @@
-#ifndef FUNCIONES4-5_H
-#define FUNCIONES4-5_H
+#ifndef _EJ_4_5_H
+#define _EJ_4_5_H
 
 #include <stdio.h>
 #include <stdint.h>
