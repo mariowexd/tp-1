@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "modulacion.h"
+
 #define E 2.718281
 #define PI 3.141592 
 

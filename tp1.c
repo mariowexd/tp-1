@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "modulacion.h"
+#include "ej3.h"
 #include "ej4_5.h"
 #define NOMBRE_MAX 255
 #define CANT_ARG 6

@@ -8,12 +8,6 @@
 #include <stdbool.h>
 #include "tp1.h"
 
-//TDA ARMONICOS
-typedef struct {
-    float *v;
-    size_t n;
-} armo_t;
-
 //TDA NOTA
 typedef struct {
     float *t0;
@@ -25,6 +19,9 @@ typedef struct {
 
 //TDA SINTETIZADOR
 typedef struct{
+    float *v;
+    size_t n;
+    //Agregarle punteros a funciones
 }sintetizador_t;
 
 //TDA MUESTRAS
@@ -36,11 +33,11 @@ bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *,
 
 void destruirNotas(nota_t *);
 
-void destruirArmonicos(armo_t *);
+void destruirSint(sintetizador_t *);
 
 int tomarFrecuencia(nota_t *, octava);
 
-armo_t *tomarArmonicos(char *);
+sintetizador_t *tomarSint(char *);
 
 nota_t *tomarNotas(char *);
 
