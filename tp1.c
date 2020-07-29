@@ -123,7 +123,8 @@ notas_t tomarNotas(char *nombre_mid){
         return NULL;
     }
 
-    notas_t *notas =NULL;
+    notas_t *notas = malloc(sizeof(notas_t));
+    
     //Leo encabezado
     formato_t formato;
     uint16_t numero_pistas;
@@ -131,6 +132,7 @@ notas_t tomarNotas(char *nombre_mid){
         
     if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra)){
         fprintf(stderr, "Fallo lectura encabezado\n");
+        free(notas_t);
         fclose(f);
         return NULL;
     }
@@ -140,6 +142,7 @@ notas_t tomarNotas(char *nombre_mid){
         if(! leer_pista(f, &tamagno_pista)){
             fprintf(stderr, "Fallo lectura pista\n");
             fclose(f);
+            free(notas_t);
             return NULL;
         }
         //Leo los evetos
@@ -179,20 +182,66 @@ notas_t tomarNotas(char *nombre_mid){
                 size_t r = 0;
                 size_t *l;
                 if(evento == NOTA_ENCENDIDA){
-                    notas.t0[i] = tiempo;
-                    notas.ff[i] = tomarFrecuencia(nota, octava);
-                    notas.a[i] = 1;// Averiguar si no esta relacionado con buffer[EVNOTA_VELOCIDAD]
+                    float t0aux = realloc(notas->t0, sizeof(float));
+                    if(t0aux == NULL){
+                        free(notas);
+                        fclose(f);
+                        return NULL;
+                    }
+                    float aaux = realloc(notas->a, sizeof(float));
+                    if(aaux == NULL){
+                        free(t0aux);
+                        free(notas);
+                        fclose(f);
+                        return NULL;
+                    }
+                    int ffaux = realloc(notas->ff, sizeof(int));
+                    if(ffaux == NULL){
+                        free(t0aux);
+                        free(aaux);
+                        free(notas);
+                        fclose(f);
+                        return NULL;
+                    }
+                    size_t laux = realloc(l, sizeof(size_t));
+                    if(laux == NULL){
+                        free(t0aux);
+                        free(aaux);
+                        free(ffaux);
+                        free(notas);
+                        fclose(f);
+                        return NULL;
+                    }
+                    notas->t0[i] = tiempo;
+                    notas->ff[i] = tomarFrecuencia(nota, octava);
+                    notas->a[i] = buffer[EVNOTA_VELOCIDAD];
                     l[i] = i;
-                    notas->n += 1;
+                    notas->n = i + 1;
                     i++;
+                    
+                    aaux = notas->a;
+                    ffaux = notas->f;
+                    t0aux = notas-> t0;
+                    laux = l;
                 }
                 else if(evento == NOTA_APAGADA ||(evento == NOTA_ENCENDIDA && buffer[EVNOTA_VELOCIDAD] == 0)){
-                    notas.tf[l[r]] = tiempo - notas.t0[l[r]];
+                    float tfaux = realloc(notas->tf, sizeof(float));
+                    if(tfaux == NULL){
+                        free(t0);
+                        free(a);
+                        free(ff);
+                        free(l);
+                        free(notas);
+                        fclose(f);
+                        return NULL;
+                    }
+                    notas->tf[l[r]] = tiempo - notas->t0[l[r]];
                     r++;
                 }
             }
 
         }
+    free(l);
     fclose(f);
     return notas;
 }
