@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
     if (sint==NULL) return 1;
 
     notas_t *notas = tomarNotas(nombre_mid); //Esta esta por hacer
-    if (nombre_mid==NULL) return 1; 
+    if (nombre_mid==NULL) return 1;
 
     /*tramo_t *tramo = muestrearTramo(sint, notas, frec_muestreo);
     if (tramo==NULL) return 1;*/

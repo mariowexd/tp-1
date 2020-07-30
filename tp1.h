@@ -7,6 +7,8 @@
 #include <math.h>
 #include <stdbool.h>
 #include "tp1.h"
+#include "ej4_5.h"
+#include "ej3.h"
 
 //TDA NOTA
 typedef struct {
@@ -25,23 +27,24 @@ typedef struct{
 }sintetizador_t;
 
 //TDA TRAMOFIMAL
-typedef struct{
+/*typedef struct{
     float *v;
     size_t n;
 }tramoFinal_t;
+*/
 
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
 
-void destruirNotas(nota_t *);
+void destruirNotas(notas_t *);
 
 void destruirSint(sintetizador_t *);
 
-int tomarFrecuencia(notas_t *, size_t);
+int tomarFrecuencia(nota_t , signed char);
 
 sintetizador_t *tomarSint(char *);
 
-nota_t *tomarNotas(char *);
+notas_t *tomarNotas(char *);
 
 tramo_t *muestrearTramo(sintetizador_t, notas_t , int);
 

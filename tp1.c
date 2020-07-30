@@ -5,7 +5,7 @@
 #include <string.h>
 #include "modulacion.h"
 #include "ej3.h"
-
+#include "tp1.h"
 #include "ej4_5.h"
 #define NOMBRE_MAX 255
 #define CANT_ARG 6
@@ -82,7 +82,7 @@ bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_
     }
 }*/
 
-tramoFinal_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
+/*tramoFinal_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
     tramoFinal_t *tramof = malloc(sizeof(tramoFinal_t));
     if(tramof == NULL) return NULL;
     size_t x = 0;
@@ -101,11 +101,9 @@ tramoFinal_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
     tramof->v = tramo->v;
     tramo_destruir(tramo);
     return tramof;
+}*/
 
-
-}
-
-int tomarFrecuencia(nota_t nota, int octava){
+int tomarFrecuencia(nota_t nota, signed char octava){
     int n = nota+12*(octava+1);
     n = n - LA_4_VAL;
     float factor = pow(RAIZ_12_2, n);
@@ -129,7 +127,13 @@ sintetizador_t *tomarSint(char *nombre){
         printf("No hay memeoria\n");
         return NULL;
     }
-    sint->v = malloc(naux*sizeof(float));
+    sint->v[0] = malloc(naux*sizeof(float));
+    if(sint->v == NULL){
+        printf("No hay memeoria\n");
+        free(sint);
+        return  NULL;
+    }
+    sint->v[1] = malloc(naux*sizeof(float));
     if(sint->v == NULL){
         printf("No hay memeoria\n");
         free(sint);
@@ -141,16 +145,19 @@ sintetizador_t *tomarSint(char *nombre){
     for(size_t x=0; x<naux; x++){
         cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
         fgets(aux2, cant_chars, archivo);
-        sint->v[x] = atof(aux2+2);
-        printf("%f\n", sint->v[x]);
+        sint->v[x][1] = atof(aux2+2);
+        printf("%f\n", sint->v[x][1]);
+    }
+    for(size_t x=0; x<naux; x++){
+        sint->v[x][0] = x;
     }
     fclose(archivo);
     return sint;
 }
 
-notas_t tomarNotas(char *nombre_mid){
-    FILE *f = fopen(nombre, "rb");
-    if (archivo==NULL){
+notas_t *tomarNotas(char *nombre_mid){
+    FILE *f = fopen(nombre_mid, "rb");
+    if (f==NULL){
         printf("Archivo sintetizador no encontrado");
         return NULL;
     }
@@ -160,14 +167,15 @@ notas_t tomarNotas(char *nombre_mid){
         fprintf(stderr, "No hay memoria\n");
         return NULL;
     } 
-
+    uint8_t buffer[EVENTO_MAX_LONG];
     formato_t formato;
     uint16_t numero_pistas;
     uint16_t pulsos_negra;
-        
+    size_t *l=NULL;
+
     if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra)){
         fprintf(stderr, "Fallo lectura encabezado\n");
-        free(notas_t);
+        free(notas);
         fclose(f);
         return NULL;
     }
@@ -176,14 +184,13 @@ notas_t tomarNotas(char *nombre_mid){
         if(! leer_pista(f, &tamagno_pista)){
             fprintf(stderr, "Fallo lectura pista\n");
             fclose(f);
-            free(notas_t);
+            free(notas);
             return NULL;
         }
         evento_t evento;
         char canal;
         int longitud;
         uint32_t tiempo;
-        
         while(1) {
             uint32_t delta_tiempo;
             leer_tiempo(f, &delta_tiempo);
@@ -212,62 +219,62 @@ notas_t tomarNotas(char *nombre_mid){
                 
                 size_t i = 0;    
                 size_t r = 0;
-                size_t *l;
                 if(evento == NOTA_ENCENDIDA){
-                    float t0aux = realloc(notas->t0, sizeof(float));
+                    float *t0aux = realloc(notas->t0, sizeof(float));
                     if(t0aux == NULL){
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    float aaux = realloc(notas->a, sizeof(float));
+                    float *aaux = realloc(notas->a, sizeof(float));
                     if(aaux == NULL){
-                        free(t0aux);
+                        free(notas->t0);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    int ffaux = realloc(notas->ff, sizeof(int));
+                    int *ffaux = realloc(notas->ff, sizeof(int));
                     if(ffaux == NULL){
-                        free(t0aux);
-                        free(aaux);
+                        free(notas->t0);
+                        free(notas->a);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    size_t laux = realloc(l, sizeof(size_t));
+                    size_t *laux = realloc(l, sizeof(size_t));
                     if(laux == NULL){
-                        free(t0aux);
-                        free(aaux);
-                        free(ffaux);
+                        free(notas->t0);
+                        free(notas->a);
+                        free(notas->ff);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
+                    aaux = notas->a;
+                    ffaux = notas->ff;
+                    t0aux = notas-> t0;
+                    laux = l;
                     notas->t0[i] = tiempo;
                     notas->ff[i] = tomarFrecuencia(nota, octava);
                     notas->a[i] = buffer[EVNOTA_VELOCIDAD];
                     l[i] = i;
                     notas->n = i + 1;
                     i++;
-                    
-                    aaux = notas->a;
-                    ffaux = notas->f;
-                    t0aux = notas-> t0;
-                    laux = l;
                 }
                 else if(evento == NOTA_APAGADA ||(evento == NOTA_ENCENDIDA && buffer[EVNOTA_VELOCIDAD] == 0)){
-                    float tfaux = realloc(notas->tf, sizeof(float));
+                    float *tfaux = realloc(notas->tf, sizeof(float));
                     if(tfaux == NULL){
-                        free(t0);
-                        free(a);
-                        free(ff);
+                        free(notas->t0);
+                        free(notas->a);
+                        free(notas->ff);
                         free(l);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
+                    notas->tf = tfaux;
                     notas->tf[l[r]] = tiempo - notas->t0[l[r]];
+
                     r++;
                 }
             }
@@ -278,11 +285,13 @@ notas_t tomarNotas(char *nombre_mid){
     return notas;   
 }
 
-void destruirTramo(tramo_t *tramo){
+/*void destruirTramo(tramo_t *tramo){
     free(tramo->v);
     free(tramo);
-}
-void destruirNotas(nota_t notas){
+}*/
+
+
+void destruirNotas(notas_t *notas){
     free(notas->t0);
     free(notas->tf);
     free(notas->a);

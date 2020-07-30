@@ -5,6 +5,8 @@
 #include <math.h>
 #include "ej3.h"
 
+#define PI 3.141592 
+
 size_t calcular_n(double t0, double tf, int f_m){
     size_t n = (tf-t0)*f_m+0.5;
     return n;
