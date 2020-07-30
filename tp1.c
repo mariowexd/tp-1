@@ -141,6 +141,8 @@ sintetizador_t *tomarSint(char *nombre){
     fclose(archivo);
     return sint;
 }
+
+
 notas_t *tomarNotas(char *nombre_mid){
     FILE *f = fopen(nombre_mid, "rb");
     if (f==NULL){
@@ -158,6 +160,11 @@ notas_t *tomarNotas(char *nombre_mid){
     uint16_t numero_pistas;
     uint16_t pulsos_negra;
     size_t *l=NULL;
+    float *t0aux = NULL;
+    float *aaux = NULL;
+    int *ffaux = NULL;
+    size_t *laux = NULL;
+    float *tfaux = NULL;
 
     if(! leer_encabezado(f, &formato, &numero_pistas, &pulsos_negra)){
         fprintf(stderr, "Fallo lectura encabezado\n");
@@ -206,20 +213,20 @@ notas_t *tomarNotas(char *nombre_mid){
                 size_t i = 0;    
                 size_t r = 0;
                 if(evento == NOTA_ENCENDIDA){
-                    float *t0aux = realloc(notas->t0, sizeof(float));
+                    t0aux = realloc(notas->t0, sizeof(float));
                     if(t0aux == NULL){
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    float *aaux = realloc(notas->a, sizeof(float));
+                    aaux = realloc(notas->a, sizeof(float));
                     if(aaux == NULL){
                         free(notas->t0);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    int *ffaux = realloc(notas->ff, sizeof(int));
+                    ffaux = realloc(notas->ff, sizeof(int));
                     if(ffaux == NULL){
                         free(notas->t0);
                         free(notas->a);
@@ -227,7 +234,7 @@ notas_t *tomarNotas(char *nombre_mid){
                         fclose(f);
                         return NULL;
                     }
-                    size_t *laux = realloc(l, sizeof(size_t));
+                    laux = realloc(l, sizeof(size_t));
                     if(laux == NULL){
                         free(notas->t0);
                         free(notas->a);
@@ -248,7 +255,7 @@ notas_t *tomarNotas(char *nombre_mid){
                     i++;
                 }
                 else if(evento == NOTA_APAGADA ||(evento == NOTA_ENCENDIDA && buffer[EVNOTA_VELOCIDAD] == 0)){
-                    float *tfaux = realloc(notas->tf, sizeof(float));
+                    tfaux = realloc(notas->tf, sizeof(float));
                     if(tfaux == NULL){
                         free(notas->t0);
                         free(notas->a);
