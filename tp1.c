@@ -70,7 +70,7 @@ bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_
     return true;
 }
 //TE CAMBIE LA SINTAXIS DE TRAMO_T PQ YA ESTA RESERVADA TE PONGO ABAJO COMO LO HARIA
-tramo_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
+/*tramo_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
     size_t x = 0;
     tramo_t *tramo = tramo_crear_muestreo(notas->t0[x], notas->tf[x], f_m, notas->ff[x], notas->a[x], sint->v, sint->n);
     if(tramo == NULL) return NULL;
@@ -80,7 +80,8 @@ tramo_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
         bool k = tramo_extender(tramo, tramoAux);
         if (k == false) return NULL;
     }
-}
+}*/
+
 tramoFinal_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
     tramoFinal_t *tramof = malloc(sizeof(tramoFinal_t));
     if(tramof == NULL) return NULL;
@@ -90,9 +91,10 @@ tramoFinal_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
     for(; x < notas->n; x++){
         tramo_t *tramoAux = tramo_crear_muestreo(notas->t0[x], notas->tf[x], f_m, notas->ff[x], notas->a[x], sint->v, sint->n);
         if(tramoAux == NULL) return NULL;
-        bool k = tramo_extender(tramo, tramoAux);
-        if (k == false) return NULL;
+        else if(tramo_extender(tramo, tramoAux) == false)
+            return NULL;
     }
+    
     tramof->v = malloc(sizeof(float)*notas->n);
     if(tramof->v == NULL) return NULL;
     tramof->n = notas->n;
