@@ -21,8 +21,9 @@ typedef struct {
 
 //TDA SINTETIZADOR
 typedef struct{
-    float *v[2];
+    float **v;
     size_t n;
+    //0<t<0.05 como el ataque, 0.05<t<0.25 como el sostenido y t>0.25 como el decaimiento:
     //Agregarle punteros a funciones
 }sintetizador_t;
 

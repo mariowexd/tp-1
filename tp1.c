@@ -11,7 +11,7 @@
 #define CANT_ARG 6
 #define CANT_ARG_TXT 3
 #define ARG_MAX 12
-#define CANT_CHAR_RENGLON 10
+#define CANT_CHAR_RENGLON 11
 #define CANT_ARM_MAX 4
 #define LA_4_FREC 440
 #define LA_4_VAL 69
@@ -116,45 +116,31 @@ sintetizador_t *tomarSint(char *nombre){
         printf("Archivo sintetizador no encontrado");
         return NULL;
     }
-
     size_t naux = 0;
     char aux1[CANT_ARM_MAX];
     fgets(aux1, CANT_ARM_MAX, archivo);
     naux = atoi(aux1);
+    
+    sintetizador_t *sint =malloc(sizeof(sintetizador_t));
+    sint->v = (float **)malloc(naux*sizeof(float *));
+    for(size_t x = 0; x<naux; x++){
+        sint->v[x] = (float *)malloc(2*sizeof(float));
+    }
 
-    sintetizador_t *sint = malloc(sizeof(sintetizador_t));
-    if(sint == NULL){
-        printf("No hay memeoria\n");
-        return NULL;
-    }
-    sint->v[0] = malloc(naux*sizeof(float));
-    if(sint->v == NULL){
-        printf("No hay memeoria\n");
-        free(sint);
-        return  NULL;
-    }
-    sint->v[1] = malloc(naux*sizeof(float));
-    if(sint->v == NULL){
-        printf("No hay memeoria\n");
-        free(sint);
-        return  NULL;
-    }
     sint->n = naux;
     char aux2[CANT_CHAR_RENGLON];
-    size_t cant_chars = 0;
+
     for(size_t x=0; x<naux; x++){
-        cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
+        size_t cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
         fgets(aux2, cant_chars, archivo);
+        sint->v[x][0] = x+1;
         sint->v[x][1] = atof(aux2+2);
-        printf("%f\n", sint->v[x][1]);
+        //printf("%f   %f\n", sint->v[x][0], sint->v[x][1]);
     }
-    for(size_t x=0; x<naux; x++){
-        sint->v[x][0] = x;
-    }
+
     fclose(archivo);
     return sint;
 }
-
 notas_t *tomarNotas(char *nombre_mid){
     FILE *f = fopen(nombre_mid, "rb");
     if (f==NULL){
