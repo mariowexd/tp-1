@@ -5,6 +5,7 @@
 #include <string.h>
 #include "modulacion.h"
 #include "ej3.h"
+
 #include "ej4_5.h"
 #define NOMBRE_MAX 255
 #define CANT_ARG 6
@@ -68,17 +69,18 @@ bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_
         return false;
     return true;
 }
-
-/*tramo_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
+//TE CAMBIE LA SINTAXIS DE TRAMO_T PQ YA ESTA RESERVADA
+tramo_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
     size_t x = 0;
     tramo_t *tramo = tramo_crear_muestreo(notas->t0[x], notas->tf[x], f_m, notas->ff[x], notas->a[x], sint->v, sint->n);
+    if(tramo == NULL) return NULL;
     for(; x<notas->n, x++){
         tramo_t *tramoAux = tramo_crear_muestreo(notas->t0[x], notas->tf[x], f_m, notas->ff[x], notas->a[x], sint->v, sint->n);
+        if(tramoAux == NULL) return NULL;
         bool k = tramo_extender(tramo, tramoAux);
         if (k == false) return NULL;
     }
 }
-*/
 
 int tomarFrecuencia(nota_t nota, int octava){
     int n = nota+12*(octava+1);
@@ -100,8 +102,16 @@ sintetizador_t *tomarSint(char *nombre){
     naux = atoi(aux1);
 
     sintetizador_t *sint = malloc(sizeof(sintetizador_t));
+    if(sint == NULL){
+        printf("No hay memeoria\n");
+        return NULL;
+    }
     sint->v = malloc(naux*sizeof(float));
-
+    if(sint->v == NULL){
+        printf("No hay memeoria\n");
+        free(sint);
+        return  NULL;
+    }
     sint->n = naux;
     char aux2[CANT_CHAR_RENGLON];
     size_t cant_chars = 0;
@@ -123,8 +133,11 @@ notas_t tomarNotas(char *nombre_mid){
     }
 
     notas_t *notas = malloc(sizeof(notas_t));
-    
-    //Leo encabezado
+    if(notas == NULL){
+        fprintf(stderr, "No hay memoria\n");
+        return NULL;
+    } 
+
     formato_t formato;
     uint16_t numero_pistas;
     uint16_t pulsos_negra;
@@ -135,7 +148,6 @@ notas_t tomarNotas(char *nombre_mid){
         fclose(f);
         return NULL;
     }
-    //Leo e itero las pistas
     for(uint16_t pista = 0; pista < numero_pistas; pista++) {
         uint32_t tamagno_pista;
         if(! leer_pista(f, &tamagno_pista)){
@@ -144,14 +156,12 @@ notas_t tomarNotas(char *nombre_mid){
             free(notas_t);
             return NULL;
         }
-        //Leo los evetos
         evento_t evento;
         char canal;
         int longitud;
         uint32_t tiempo;
         
         while(1) {
-            //Guardo el tiempo
             uint32_t delta_tiempo;
             leer_tiempo(f, &delta_tiempo);
             tiempo += delta_tiempo;

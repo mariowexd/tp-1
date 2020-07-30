@@ -24,11 +24,11 @@ typedef struct{
     //Agregarle punteros a funciones
 }sintetizador_t;
 
-//TDA TRAMO
+//TDA TRAMOFIMAL
 typedef struct{
     float *v;
     size_t n;
-}tramo_t;
+}tramofinal_t;
 
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
