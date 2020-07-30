@@ -19,14 +19,16 @@ typedef struct {
 
 //TDA SINTETIZADOR
 typedef struct{
-    float *v;
+    float *v[2];
     size_t n;
     //Agregarle punteros a funciones
 }sintetizador_t;
 
-//TDA MUESTRAS
+//TDA TRAMO
 typedef struct{
-}muestras_t;
+    float *v;
+    size_t n;
+}tramo_t;
 
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
@@ -35,10 +37,12 @@ void destruirNotas(nota_t *);
 
 void destruirSint(sintetizador_t *);
 
-int tomarFrecuencia(nota_t *, octava);
+int tomarFrecuencia(notas_t *, size_t);
 
 sintetizador_t *tomarSint(char *);
 
 nota_t *tomarNotas(char *);
+
+//tramo_t *muestrearTramo(sintetizador_t, notas_t);
 
 #endif

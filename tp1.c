@@ -69,17 +69,16 @@ bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_
     return true;
 }
 
-void destruirNotas(nota_t notas){
-    free(notas->t0);
-    free(notas->tf);
-    free(notas->a);
-    free(notas->ff);
-    free(notas);
+/*tramo_t *muestrearTramo(sintetizador_t sint, notas_t notas, int f_m){
+    size_t x = 0;
+    tramo_t *tramo = tramo_crear_muestreo(notas->t0[x], notas->tf[x], f_m, notas->ff[x], notas->a[x], sint->v, sint->n);
+    for(; x<notas->n, x++){
+        tramo_t *tramoAux = tramo_crear_muestreo(notas->t0[x], notas->tf[x], f_m, notas->ff[x], notas->a[x], sint->v, sint->n);
+        bool k = tramo_extender(tramo, tramoAux);
+        if (k == false) return NULL;
+    }
 }
-void destruirArmonicos(armo_t *armos){
-    free(armos->v);
-    free(armos);
-}
+*/
 
 int tomarFrecuencia(nota_t nota, int octava){
     int n = nota+12*(octava+1);
@@ -88,7 +87,7 @@ int tomarFrecuencia(nota_t nota, int octava){
     return LA_4_FREC*factor;
 }
 
-armo_t *tomarArmonicos(char *nombre){
+sintetizador_t *tomarSint(char *nombre){
     FILE *archivo = fopen(nombre, "rt");
     if (archivo==NULL){
         printf("Archivo sintetizador no encontrado");
@@ -100,20 +99,20 @@ armo_t *tomarArmonicos(char *nombre){
     fgets(aux1, CANT_ARM_MAX, archivo);
     naux = atoi(aux1);
 
-    armo_t *armos = malloc(sizeof(armo_t));
-    armos->v = malloc(naux*sizeof(float));
+    sintetizador_t *sint = malloc(sizeof(sintetizador_t));
+    sint->v = malloc(naux*sizeof(float));
 
-    armos->n = naux;
+    sint->n = naux;
     char aux2[CANT_CHAR_RENGLON];
     size_t cant_chars = 0;
     for(size_t x=0; x<naux; x++){
         cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
         fgets(aux2, cant_chars, archivo);
-        armos->v[x] = atof(aux2+2);
-        printf("%f\n", armos->v[x]);
+        sint->v[x] = atof(aux2+2);
+        printf("%f\n", sint->v[x]);
     }
     fclose(archivo);
-    return armos;
+    return sint;
 }
 
 notas_t tomarNotas(char *nombre_mid){
@@ -239,9 +238,26 @@ notas_t tomarNotas(char *nombre_mid){
                     r++;
                 }
             }
-
         }
+    }
     free(l);
     fclose(f);
-    return notas;
+    return notas;   
+}
+
+void destruirTramo(tramo_t *tramo){
+    free(tramo->v);
+    free(tramo);
+}
+void destruirNotas(nota_t notas){
+    free(notas->t0);
+    free(notas->tf);
+    free(notas->a);
+    free(notas->ff);
+    free(notas);
+}
+
+void destruirSint(sintetizador_t *sint){
+    free(sint->v);
+    free(sint);
 }

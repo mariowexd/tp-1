@@ -1,5 +1,23 @@
 #ifndef _modulacion_h_
 #define _modulacion_h_
+
+/*typedef  {
+    CONSTANT,
+    LINEAR,
+    INVLINEAR,
+    SIN,
+    EXP,
+    INVEXP,
+    QUARTCOS,
+    QUARTSIN,
+    HALFCOS,
+    HALFSIN,
+    LOG,
+    INVLOG,
+    TRI,
+    PULSES
+}funmod_t;*/
+
 float mConstant(double t, float params[3]);
 float mLinear(double t, float params[3]);
 float mInvlinear(double t, float params[3]);

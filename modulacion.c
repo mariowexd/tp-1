@@ -5,8 +5,47 @@
 
 #define E 2.718281
 #define PI 3.141592 
+/*
+char *fcad[]{
+    [CONSTANT]="CONSTANT",
+    [LINEAR]="LINEAR",
+    [INVLINEAR]="INVLINEAR",
+    [SIN]="SIN",
+    [EXP]="EXP",
+    [INVEXP]="INVEXP",
+    [QUARTCOS]="QUARTCOS",
+    [QUARTSIN]="QUARTSIN",
+    [HALFCOS]="HALFCOS",
+    [HALFSIN]="HALFSIN",
+    [LOG]="LOG",
+    [INVLOG]="INVLOG",
+    [TRI]="TRI",
+    [PULSES]="PULSES"
+};
+float (*p[])(double t, float params[]){
+    [CONSTANT] = mConstant,
+    [LINEAR] = mLinear,
+    [INVLINEAR] = mInvlinear,
+    [SIN] = mSin,
+    [EXP] = mExp,
+    [INVEXP] = mInvexp,
+    [QUARTCOS] = mQuartCos,
+    [QUARTSIN] = mQuartSin,
+    [HALFCOS] = mHalfCos,
+    [HALFSIN] = mHalfSin,
+    [LOG] = mLog,
+    [INVLOG] = mInvlog,
+    [TRI] = mTri,
+    [PULSES] = mPulses
+};
+
+*/
+
+
 
 //******FUNCIONES DE MODULACION:********//
+
+
 float mConstant(double t, float params[3]) {
     return 1;
 }
