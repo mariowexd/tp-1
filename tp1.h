@@ -28,7 +28,7 @@ typedef struct{
 typedef struct{
     float *v;
     size_t n;
-}tramofinal_t;
+}tramoFinal_t;
 
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
@@ -43,6 +43,6 @@ sintetizador_t *tomarSint(char *);
 
 nota_t *tomarNotas(char *);
 
-//tramo_t *muestrearTramo(sintetizador_t, notas_t);
+tramo_t *muestrearTramo(sintetizador_t, notas_t , int);
 
 #endif
