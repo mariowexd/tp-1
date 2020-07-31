@@ -213,20 +213,20 @@ notas_t *tomarNotas(char *nombre_mid){
                 size_t i = 0;    
                 size_t r = 0;
                 if(evento == NOTA_ENCENDIDA){
-                    t0aux = realloc(notas->t0, sizeof(float));
+                    t0aux = realloc(notas->t0, sizeof(float) * (i + 1));
                     if(t0aux == NULL){
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    aaux = realloc(notas->a, sizeof(float));
+                    aaux = realloc(notas->a, sizeof(float) * (i + 1));
                     if(aaux == NULL){
                         free(notas->t0);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    ffaux = realloc(notas->ff, sizeof(int));
+                    ffaux = realloc(notas->ff, sizeof(int) * (i + 1));
                     if(ffaux == NULL){
                         free(notas->t0);
                         free(notas->a);
@@ -234,7 +234,7 @@ notas_t *tomarNotas(char *nombre_mid){
                         fclose(f);
                         return NULL;
                     }
-                    laux = realloc(l, sizeof(size_t));
+                    laux = realloc(l, sizeof(size_t) * (i + 1));
                     if(laux == NULL){
                         free(notas->t0);
                         free(notas->a);
@@ -247,6 +247,7 @@ notas_t *tomarNotas(char *nombre_mid){
                     ffaux = notas->ff;
                     t0aux = notas-> t0;
                     laux = l;
+
                     notas->t0[i] = tiempo;
                     notas->ff[i] = tomarFrecuencia(nota, octava);
                     notas->a[i] = buffer[EVNOTA_VELOCIDAD];
@@ -255,7 +256,7 @@ notas_t *tomarNotas(char *nombre_mid){
                     i++;
                 }
                 else if(evento == NOTA_APAGADA ||(evento == NOTA_ENCENDIDA && buffer[EVNOTA_VELOCIDAD] == 0)){
-                    tfaux = realloc(notas->tf, sizeof(float));
+                    tfaux = realloc(notas->tf, sizeof(float) * (r + 1));
                     if(tfaux == NULL){
                         free(notas->t0);
                         free(notas->a);
