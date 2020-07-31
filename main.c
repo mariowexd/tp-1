@@ -34,7 +34,7 @@ int main(int argc, char* argv[]){
     if (tramo==NULL) return 1;*/
 
 
-    //destruirNotas(notas);
+    destruirNotas(notas);
     //destruirSint(sint);
     return 0;
 }
