@@ -26,7 +26,7 @@ int main(int argc, char* argv[]){
     notas_t *notas = tomarNotas(nombre_mid);
     if (nombre_mid==NULL) return 1;
 
-
+    printf("HAY %d NOTAS\n", notas->n);
     for(size_t x=0; x<notas->n; x++){
         printf("%f  %f  %f  %d\n", notas->t0[x],  notas->tf[x],  notas->a[x],  notas->ff[x]);
     }

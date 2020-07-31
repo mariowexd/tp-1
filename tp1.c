@@ -213,20 +213,20 @@ notas_t *tomarNotas(char *nombre_mid){
                 size_t i = 0;    
                 size_t r = 0;
                 if(evento == NOTA_ENCENDIDA){
-                    t0aux = realloc(notas->t0, sizeof(float) * (i + 1));
+                    t0aux = realloc(t0aux, sizeof(float) * (i + 1));
                     if(t0aux == NULL){
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    aaux = realloc(notas->a, sizeof(float) * (i + 1));
+                    aaux = realloc(aaux, sizeof(float) * (i + 1));
                     if(aaux == NULL){
                         free(notas->t0);
                         free(notas);
                         fclose(f);
                         return NULL;
                     }
-                    ffaux = realloc(notas->ff, sizeof(int) * (i + 1));
+                    ffaux = realloc(ffaux, sizeof(int) * (i + 1));
                     if(ffaux == NULL){
                         free(notas->t0);
                         free(notas->a);
@@ -234,7 +234,7 @@ notas_t *tomarNotas(char *nombre_mid){
                         fclose(f);
                         return NULL;
                     }
-                    laux = realloc(l, sizeof(size_t) * (i + 1));
+                    laux = realloc(laux, sizeof(size_t) * (i + 1));
                     if(laux == NULL){
                         free(notas->t0);
                         free(notas->a);
@@ -243,7 +243,7 @@ notas_t *tomarNotas(char *nombre_mid){
                         fclose(f);
                         return NULL;
                     }
-                    notas-> = aaaux;
+                    notas->a = aaux;
                     notas->ff = ffaux;
                     notas-> t0 = t0aux;
                     l = laux;
@@ -276,7 +276,7 @@ notas_t *tomarNotas(char *nombre_mid){
     }
     free(l);
     fclose(f);
-    return notas;   
+    return notas;
 }
 
 /*void destruirTramo(tramo_t *tramo){
