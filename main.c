@@ -5,8 +5,8 @@
 #include <string.h>
 #include "tp1.h"
 #include "ej3.h"
-#include "ej4_5.h"
-#include "modulacion.h"
+#include "ej45.h"
+#include "mod.h"
 #define NOMBRE_MAX 255; //longitud maxima de nombres de archivos permitido en Linux
 
 int main(int argc, char* argv[]){
@@ -26,9 +26,9 @@ int main(int argc, char* argv[]){
     notas_t *notas = tomarNotas(nombre_mid);
     if (nombre_mid==NULL) return 1;
 
-    printf("HAY %d NOTAS\n", notas->n);
+    printf("HAY %lu NOTAS\n", notas->n);
     for(size_t x=0; x<notas->n; x++){
-        printf("%f  %f  %f  %d\n", notas->t0[x],  notas->tf[x],  notas->a[x],  notas->ff[x]);
+        printf("t0 = %d   tf = %d   a = %d   ff = %d\n", notas->t0[x], notas->tf[x], notas->a[x], notas->ff[x]);
     }
     /*tramo_t *tramo = muestrearTramo(sint, notas, frec_muestreo);
     if (tramo==NULL) return 1;*/

@@ -7,14 +7,14 @@
 #include <math.h>
 #include <stdbool.h>
 #include "tp1.h"
-#include "ej4_5.h"
+#include "ej45.h"
 #include "ej3.h"
 
 //TDA NOTA
 typedef struct {
-    float *t0;
-    float *tf;
-    float *a;
+    uint32_t *t0;
+    uint32_t *tf;
+    uint32_t *a;
     int *ff; //frecuencia fundamental
     size_t n;
 }notas_t;

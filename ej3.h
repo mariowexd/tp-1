@@ -1,5 +1,5 @@
-#ifndef _ej3_h_
-#define _ej3_h_
+#ifndef _EJ3_H_
+#define _EJ3_H_
 
 typedef struct {
     float *v;
