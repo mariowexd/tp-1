@@ -243,10 +243,10 @@ notas_t *tomarNotas(char *nombre_mid){
                         fclose(f);
                         return NULL;
                     }
-                    aaux = notas->a;
-                    ffaux = notas->ff;
-                    t0aux = notas-> t0;
-                    laux = l;
+                    notas-> = aaaux;
+                    notas->ff = ffaux;
+                    notas-> t0 = t0aux;
+                    l = laux;
 
                     notas->t0[i] = tiempo;
                     notas->ff[i] = tomarFrecuencia(nota, octava);
