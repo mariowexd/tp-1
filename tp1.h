@@ -9,6 +9,26 @@
 #include "tp1.h"
 #include "ej45.h"
 #include "ej3.h"
+#include "mod.h"
+
+#define NOMBRE_MAX 255
+#define CANT_ARG 6
+#define CANT_ARG_TXT 3
+#define ARG_MAX 12
+#define CANT_CHAR_RENGLON 11
+#define CANT_ARM_MAX 4
+#define LA_4_FREC 440
+#define LA_4_VAL 69
+#define RAIZ_12_2 1.05946309435929
+
+#define CANT_CHAR_MAX_MOD 38
+
+#define METAEVENTO_FIN_DE_PISTA 0x2F
+#define EVENTO_MAX_LONG 10
+
+enum {EVNOTA_NOTA, EVNOTA_VELOCIDAD};
+
+enum {METAEVENTO_TIPO, METAEVENTO_LONGITUD};
 
 //TDA NOTA
 typedef struct {
@@ -18,14 +38,6 @@ typedef struct {
     int *ff; //frecuencia fundamental
     size_t n;
 }notas_t;
-
-//TDA SINTETIZADOR
-typedef struct{
-    float **v;
-    size_t n;
-    //0<t<0.05 como el ataque, 0.05<t<0.25 como el sostenido y t>0.25 como el decaimiento:
-    //Agregarle punteros a funciones
-}sintetizador_t;
 
 //TDA TRAMOFIMAL
 /*typedef struct{
@@ -37,10 +49,6 @@ typedef struct{
 
 bool tomarArgumentos(size_t , char *[], char *, char *, char *, size_t *, int *, int *);
 
-void destruirNotas(notas_t *);
-
-void destruirSint(sintetizador_t *);
-
 int tomarFrecuencia(nota_t , signed char);
 
 sintetizador_t *tomarSint(char *);
@@ -48,5 +56,11 @@ sintetizador_t *tomarSint(char *);
 notas_t *tomarNotas(char *);
 
 tramo_t *muestrearTramo(sintetizador_t, notas_t , int);
+
+void destruirNotas(notas_t *);
+
+void destruirSint(sintetizador_t *);
+
+//void destruirTramo(tramo_t *)
 
 #endif

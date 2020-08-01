@@ -3,9 +3,6 @@
 #include <math.h>
 #include "mod.h"
 
-#define E 2.718281
-#define PI 3.141592 
-/*
 char *fcad[]{
     [CONSTANT]="CONSTANT",
     [LINEAR]="LINEAR",
@@ -38,8 +35,6 @@ float (*p[])(double t, float params[]){
     [TRI] = mTri,
     [PULSES] = mPulses
 };
-
-*/
 
 
 

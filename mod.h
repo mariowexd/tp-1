@@ -1,7 +1,19 @@
 #ifndef _MOD_H_
 #define _MOD_H_
 
-/*typedef  {
+#define E 2.718281
+#define PI 3.141592 
+#define CANT_MODOS 14
+
+//TDA SINTETIZADOR
+typedef struct{
+    float **v;
+    size_t n;
+    float (*p[3])(double, float[3]);
+    /*float parametros[3][3];*/
+}sintetizador_t;
+
+typedef enum {
     CONSTANT,
     LINEAR,
     INVLINEAR,
@@ -16,7 +28,7 @@
     INVLOG,
     TRI,
     PULSES
-}funmod_t;*/
+}funmod_t;
 
 float mConstant(double t, float params[3]);
 float mLinear(double t, float params[3]);

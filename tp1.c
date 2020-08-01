@@ -7,25 +7,8 @@
 #include "ej3.h"
 #include "tp1.h"
 #include "ej45.h"
-#define NOMBRE_MAX 255
-#define CANT_ARG 6
-#define CANT_ARG_TXT 3
-#define ARG_MAX 12
-#define CANT_CHAR_RENGLON 11
-#define CANT_ARM_MAX 4
-#define LA_4_FREC 440
-#define LA_4_VAL 69
-#define RAIZ_12_2 1.05946309435929
 
-#define METAEVENTO_FIN_DE_PISTA 0x2F
-#define EVENTO_MAX_LONG 10
-
-enum {EVNOTA_NOTA, EVNOTA_VELOCIDAD};
-
-enum {METAEVENTO_TIPO, METAEVENTO_LONGITUD};
-
-bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_t *c, int *f, int *r)
-{
+bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_t *c, int *f, int *r){
     if (n > ARG_MAX)
         return false;
     bool lecturas[CANT_ARG_TXT] = {false, false, false};
@@ -75,6 +58,7 @@ int tomarFrecuencia(nota_t nota, signed char octava){
     float factor = pow(RAIZ_12_2, n);
     return LA_4_FREC*factor;
 }
+
 sintetizador_t *tomarSint(char *nombre){
     FILE *archivo = fopen(nombre, "rt");
     if (archivo==NULL){
@@ -93,17 +77,52 @@ sintetizador_t *tomarSint(char *nombre){
     }
 
     sint->n = naux;
-    char aux2[CANT_CHAR_RENGLON];
+    char aux2[CANT_CHAR_RENGLON];/////////////////////////////
 
     for(size_t x=0; x<naux; x++){
         size_t cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
-        fgets(aux2, cant_chars, archivo);
+        if(fgets(aux2, cant_chars, archivo)==NULL){
+            fclose(archivo);
+            return NULL;
+        }
         sint->v[x][0] = x+1;
         sint->v[x][1] = atof(aux2+2);
     }
+    /////////////////////////////////////////////////////
+    char cad[3][CANT_CHAR_MAX_MOD];
+    char aux3[CANT_CHAR_MAX_MOD];
+    for(size_t x=0; x<3; x++){
+        
+        if(fgets(cad[x],CANT_CHAR_MAX_MOD+1,archivo)==NULL){
+            fclose(archivo);
+            return NULL;
+        }
+        //printf("%s\n",cad[x]);
+        size_t y;
+        for(y=0; y<CANT_CHAR_RENGLON && cad[x][y]!=' '; y++){
+            aux3[y]=cad[x][y];
+        }
+        aux3[y] = '\0';
+        //printf("%s\n",aux3);
+        for(funmod_t z = 0; z<CANT_MODOS; z++){
+            if(strcmp(aux3,fcad[z])==0){
+                
+            }
+        }
 
+
+    }
+    //printf("\n las funciones son: %s\n%s\n%s\n", cad[0], cad[1], cad[2]);
     fclose(archivo);
     return sint;
+}
+
+void destruirSint(sintetizador_t *sint){
+    for(size_t x = 0; x<sint->n; x++){
+        free(sint->v[x]);
+    }
+    free(sint->v);
+    free(sint);
 }
 
 
@@ -125,7 +144,20 @@ notas_t *tomarNotas(char *nombre_mid){
     }
 
     notas_t *notas = malloc(sizeof(notas_t));
+    notas->n = 0;
+    if(notas==NULL){
+        fclose(f);
+        return NULL;
+    }
+    notas->t0 = NULL;
+    notas->tf = NULL;
+    notas->ff = NULL;
+    notas->a = NULL;
     size_t x = 0;
+    uint32_t *t0aux = NULL;
+    uint32_t *tfaux = NULL;
+    uint32_t *aaux = NULL;
+    int *ffaux = NULL;
 
     for(uint16_t pista = 0; pista < numero_pistas; pista++) {
         uint32_t tamagno_pista;
@@ -166,16 +198,22 @@ notas_t *tomarNotas(char *nombre_mid){
                     fclose(f);
                     return NULL;
                 }
-                float *tfaux = NULL;
+                //float *tfaux = NULL;
                 tfaux = realloc(notas->tf, sizeof(uint32_t)*(x));
                 if(tfaux == NULL){
+                    free(t0aux);
+                    free(tfaux);
+                    free(aaux);
+                    free(ffaux);
+                    destruirNotas(notas);
                     fprintf(stderr, "Error leyendo nota\n");
                     fclose(f);
+                    return NULL;
                 }
                 notas->tf = tfaux;
                 bool k = false;
                 int frec = tomarFrecuencia(nota, octava);
-                int y = x;
+                int y = x-1;
                 while(y>=0) {
                     if(notas->ff[y]==frec){
                         notas->tf[y]=tiempo;
@@ -196,27 +234,45 @@ notas_t *tomarNotas(char *nombre_mid){
                     fclose(f);
                     return NULL;
                 }
-                float *t0aux = NULL;
+                //float *t0aux = NULL;
                 t0aux = realloc(notas->t0, sizeof(uint32_t)*(x+1));
                 if(t0aux == NULL){
+                    free(t0aux);
+                    free(tfaux);
+                    free(aaux);
+                    free(ffaux);
+                    destruirNotas(notas);
                     fprintf(stderr, "Error leyendo nota\n");
                     fclose(f);
+                    return NULL;
                 }
                 notas->t0 = t0aux;
                 notas->t0[x] = tiempo;
-                float *aaux = NULL;
+                //float *aaux = NULL;
                 aaux = realloc(notas->a, sizeof(uint32_t)*(x+1));
                 if(aaux == NULL){
+                    free(t0aux);
+                    free(tfaux);
+                    free(aaux);
+                    free(ffaux);
+                    destruirNotas(notas);
                     fprintf(stderr, "Error leyendo nota\n");
                     fclose(f);
+                    return NULL;
                 }
                 notas->a = aaux;
                 notas->a[x] = buffer[EVNOTA_VELOCIDAD];
-                int *ffaux = NULL;
+                //int *ffaux = NULL;
                 ffaux = realloc(notas->ff, sizeof(int)*(x+1));
                 if(ffaux == NULL){
+                    free(t0aux);
+                    free(tfaux);
+                    free(aaux);
+                    free(ffaux);
+                    destruirNotas(notas);
                     fprintf(stderr, "Error leyendo nota\n");
                     fclose(f);
+                    return NULL;
                 }
                 notas->ff = ffaux;
                 notas->ff[x] = tomarFrecuencia(nota, octava);
@@ -236,9 +292,4 @@ void destruirNotas(notas_t *notas){
     free(notas->a);
     free(notas->ff);
     free(notas);
-}
-
-void destruirSint(sintetizador_t *sint){
-    free(sint->v);
-    free(sint);
 }
