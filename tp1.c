@@ -104,9 +104,11 @@ sintetizador_t *tomarSint(char *nombre){
         }
         aux3[y] = '\0';
         //printf("%s\n",aux3);
+        size_t i = 0;
         for(funmod_t z = 0; z<CANT_MODOS; z++){
             if(strcmp(aux3,fcad[z])==0){
-                
+                sint->p[i] = p[z]( , );
+                i++;
             }
         }
 
@@ -115,14 +117,6 @@ sintetizador_t *tomarSint(char *nombre){
     //printf("\n las funciones son: %s\n%s\n%s\n", cad[0], cad[1], cad[2]);
     fclose(archivo);
     return sint;
-}
-
-void destruirSint(sintetizador_t *sint){
-    for(size_t x = 0; x<sint->n; x++){
-        free(sint->v[x]);
-    }
-    free(sint->v);
-    free(sint);
 }
 
 
@@ -284,6 +278,43 @@ notas_t *tomarNotas(char *nombre_mid){
     fclose(f);
 
     return notas;
+}
+
+float *tomarAmplitud(sintetizador_t *sint, notas_t *notas, size_t x){
+    double tn = notas->tf[x] - notas->t0[x];
+    while(tn < TIEMPO_ATAQUE){
+        notas->a *= sint->p[0];
+        return notas->a;
+     }
+    while(TIEMPO_ATAQUE < tn < TIEMPO_SOSTENIDO){
+        notas->a *= sint->p[1];
+        return notas->a;
+    }
+    while(tn > TIEMPO_SOSTENIDO){
+        notas->a *= sint->p[2];
+        return notas->a;
+    }
+}
+
+tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m){
+    size_t x = 0;
+    tramo_t *tramo = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], modelarAmplitud(sint, notas, x), sint->v, sint->n);
+    if(tramo == NULL) return NULL;
+    for(; x < notas->n; x++){
+        tramo_t *tramo2 = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], modelarAmplitud(sint, notas, x), sint->v, sint->n);
+        if(tramo2 == NULL) return NULL;
+        tramo_extender(tramo, tramo2);
+        free(tramo2);
+    }
+    return tramo;
+}
+
+void destruirSint(sintetizador_t *sint){
+    for(size_t x = 0; x<sint->n; x++){
+        free(sint->v[x]);
+    }
+    free(sint->v);
+    free(sint);
 }
 
 void destruirNotas(notas_t *notas){
