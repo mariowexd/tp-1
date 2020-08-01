@@ -40,8 +40,6 @@ float (*p[])(double t, float params[]) = {
     [TRI] = mTri,
     [PULSES] = mPulses
 };
-
-
 bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_t *c, int *f, int *r){
     if (n > ARG_MAX)
         return false;
@@ -92,7 +90,6 @@ int tomarFrecuencia(nota_t nota, signed char octava){
     float factor = pow(RAIZ_12_2, n);
     return LA_4_FREC*factor;
 }
-
 sintetizador_t *tomarSint(char *nombre){
     FILE *archivo = fopen(nombre, "rt");
     if (archivo==NULL){
@@ -159,8 +156,6 @@ sintetizador_t *tomarSint(char *nombre){
     fclose(archivo);
     return sint;
 }
-
-
 notas_t *tomarNotas(char *nombre_mid){
     FILE *f = fopen(nombre_mid, "rb");
     if(f == NULL) {
@@ -335,29 +330,23 @@ float *tomarAmplitud(sintetizador_t *sint, notas_t *notas, size_t x){
     }
 }*/
 
-
-tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m){
+tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     size_t x = 0;
-    tramo_t *tramo = NULL;
-    tramo = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
-    /*size_t x = 0;
-    double t0 = notas->t0[x];
-    double tf = notas->tf[x];
+    double t0 = (notas->t0[x])/(double)pps;
+    double tf = notas->tf[x]/(double)pps;
     float f = notas->ff[x];
     float a = notas->a[x];
     size_t n_fa = sint->n;
-    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float (*)[2])sint->v, n_fa);
+    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
     if(tramo == NULL) return NULL;
-        
-    for(x=1; x < notas->n; x++){
-        tramo_t *tramo2 = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
-        if(tramo2 == NULL) return NULL;
-        tramo_extender(tramo, tramo2);
-        free(tramo2);
-        printf("HOLA");
-    }*/
+    imprimir_muestras(tramo->v, tramo->n, t0, tramo->f_m);
     return tramo;
 }
+void destruirTramo(tramo_t *tramo){
+    free(tramo->v);
+    free(tramo);
+}
+
 void destruirSint(sintetizador_t *sint){
     for(size_t x = 0; x<sint->n; x++){
         free(sint->v[x]);

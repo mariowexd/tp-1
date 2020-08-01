@@ -58,12 +58,12 @@ sintetizador_t *tomarSint(char *);
 
 notas_t *tomarNotas(char *);
 
-tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int);
+tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int, int);
 
 void destruirNotas(notas_t *);
 
 void destruirSint(sintetizador_t *);
 
-//void destruirTramo(tramo_t *)
+void destruirTramo(tramo_t *);
 
 #endif

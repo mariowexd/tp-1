@@ -54,22 +54,24 @@ tramo_t *tramo_clonar(const tramo_t *t){
 
 void muestrear_senoidal(float v[], size_t n, double t0, int f_m, float f, float a){
     for(int i=0; i<n; i++) {
-        v[i] += a*sin(2*PI*f*((double)i/f_m+t0));
+      //v[i] += a*sin(2*PI*f*((double)i/f_m+t0));
+        v[i] += a*sin(2*PI*f*((double)i/f_m));
     }
 }
 
-void muestrear_armonicos(float v[], size_t n, double t0, int f_m, float f, float a, const float fa[][2], size_t n_fa){
+void muestrear_armonicos(float v[], size_t n, double t0, int f_m, float f, float a, const float **fa, size_t n_fa){
     for(int x=0; x<n_fa; x++){
         float frecArmo = f * fa[x][0];
         float amplArmo = a * fa[x][1];
         muestrear_senoidal(v, n, t0, f_m, frecArmo, amplArmo);
-    }
+    }   
 }
 
-tramo_t *tramo_crear_muestreo(double t0, double tf, int f_m, float f, float a, const float fa[][2], size_t n_fa){  //reciclaje de MuestrearArmonicos!
+tramo_t *tramo_crear_muestreo(double t0, double tf, int f_m, float f, float a, const float **fa, size_t n_fa){  //reciclaje de MuestrearArmonicos!
     tramo_t *tramo1 = _tramo_crear(t0, tf, f_m);
     if (tramo1 == NULL) return NULL;
     muestrear_armonicos(tramo1->v, tramo1->n, t0, f_m, f, a, fa, n_fa);
+    
     return tramo1;
 
 }
@@ -116,9 +118,9 @@ bool tramo_extender(tramo_t *destino, tramo_t *extension){
 
 
 void imprimir_muestras(const float v[], size_t n, double t0, int f_m){
-    for(int i=t0*f_m; i<n; i++){
+    for(int i=t0*f_m; i<n+t0*f_m; i++){
         float fi = (float)i;
         float ff = (float)f_m;
-        printf("%f,%f\n", fi/ff, v[i]);
+        printf("%f,%f\n", fi/ff, v[i-(size_t)(t0*f_m)]);
     }
 }

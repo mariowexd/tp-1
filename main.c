@@ -15,7 +15,7 @@ int main(int argc, char* argv[]){
     char nombre_wav[255];
     size_t canal = 0;
     int frec_muestreo = 44100;
-    int pulsos_p_segundo = 2; // todavia no nos dieron un valor por defecto a usar
+    int pulsos_p_segundo = 700; // todavia no nos dieron un valor por defecto a usar
 
     bool k = tomarArgumentos(argc, argv, nombre_txt, nombre_mid, nombre_wav, &canal, &frec_muestreo, &pulsos_p_segundo);
     if (k==false) return 1;
@@ -44,17 +44,17 @@ int main(int argc, char* argv[]){
         }
         printf("\n");
     }*/
-    printf("%lu\n",notas->n);
-    tramo_t *tramo = muestrearTramo(sint, notas, frec_muestreo);
+
+
+    //printf("%lu\n",notas->n);
+
+    tramo_t *tramo = muestrearTramo(sint, notas, frec_muestreo, pulsos_p_segundo);
     if (tramo==NULL){
+        printf("Fallo crear tramo");
         destruirNotas(notas);
         destruirSint(sint);
     }
-    printf("%lu\n",tramo->n);
-    /*for(size_t x=0; notas->n; x++){
-        printf("%f\n", tramo->v[x]);
-    }*/
-    //destruirTramo(tramo);
+    destruirTramo(tramo);
     destruirNotas(notas);
     destruirSint(sint);
     return 0;
