@@ -112,7 +112,7 @@ sintetizador_t *tomarSint(char *nombre){
     }
 
     sint->n = naux;
-    char aux2[CANT_CHAR_RENGLON];/////////////////////////////
+    char aux2[CANT_CHAR_RENGLON];
 
     for(size_t x=0; x<naux; x++){
         size_t cant_chars = CANT_CHAR_RENGLON+1+(x+1)/10;
@@ -123,7 +123,6 @@ sintetizador_t *tomarSint(char *nombre){
         sint->v[x][0] = x+1;
         sint->v[x][1] = atof(aux2+2);
     }
-    /////////////////////////////////////////////////////
     char cad[3][CANT_CHAR_MAX_MOD];
     char aux3[CANT_CHAR_MAX_MOD];
     for(size_t x=0; x<3; x++){
@@ -334,20 +333,23 @@ float *tomarAmplitud(sintetizador_t *sint, notas_t *notas, size_t x){
         notas->a *= sint->p[2];
         return notas->a;
     }
-}
-*/////modelarAmplitud(sint, notas, x)
+}*/
+
 
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m){
     size_t x = 0;
+    tramo_t *tramo = NULL;
+    tramo = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
+    /*size_t x = 0;
     double t0 = notas->t0[x];
     double tf = notas->tf[x];
     float f = notas->ff[x];
     float a = notas->a[x];
     size_t n_fa = sint->n;
-    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, sint->v, n_fa);
+    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float (*)[2])sint->v, n_fa);
     if(tramo == NULL) return NULL;
         
-    /*for(x=1; x < notas->n; x++){
+    for(x=1; x < notas->n; x++){
         tramo_t *tramo2 = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
         if(tramo2 == NULL) return NULL;
         tramo_extender(tramo, tramo2);
