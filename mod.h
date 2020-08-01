@@ -10,7 +10,7 @@ typedef struct{
     float **v;
     size_t n;
     float (*p[3])(double, float[3]);
-    /*float parametros[3][3];*/
+    float parametros[3][3];
 }sintetizador_t;
 
 typedef enum {

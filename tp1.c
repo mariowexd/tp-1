@@ -8,6 +8,40 @@
 #include "tp1.h"
 #include "ej45.h"
 
+char *fcad[] = {
+    [CONSTANT]="CONSTANT",
+    [LINEAR]="LINEAR",
+    [INVLINEAR]="INVLINEAR",
+    [SIN]="SIN",
+    [EXP]="EXP",
+    [INVEXP]="INVEXP",
+    [QUARTCOS]="QUARTCOS",
+    [QUARTSIN]="QUARTSIN",
+    [HALFCOS]="HALFCOS",
+    [HALFSIN]="HALFSIN",
+    [LOG]="LOG",
+    [INVLOG]="INVLOG",
+    [TRI]="TRI",
+    [PULSES]="PULSES"
+};
+float (*p[])(double t, float params[]) = {
+    [CONSTANT] = mConstant,
+    [LINEAR] = mLinear,
+    [INVLINEAR] = mInvlinear,
+    [SIN] = mSin,
+    [EXP] = mExp,
+    [INVEXP] = mInvexp,
+    [QUARTCOS] = mQuartCos,
+    [QUARTSIN] = mQuartSin,
+    [HALFCOS] = mHalfCos,
+    [HALFSIN] = mHalfSin,
+    [LOG] = mLog,
+    [INVLOG] = mInvlog,
+    [TRI] = mTri,
+    [PULSES] = mPulses
+};
+
+
 bool tomarArgumentos(size_t n, char *v[], char *txt, char *mid, char *wav, size_t *c, int *f, int *r){
     if (n > ARG_MAX)
         return false;
@@ -92,29 +126,36 @@ sintetizador_t *tomarSint(char *nombre){
     char cad[3][CANT_CHAR_MAX_MOD];
     char aux3[CANT_CHAR_MAX_MOD];
     for(size_t x=0; x<3; x++){
-        
+    size_t aux5;
         if(fgets(cad[x],CANT_CHAR_MAX_MOD+1,archivo)==NULL){
             fclose(archivo);
             return NULL;
         }
-        //printf("%s\n",cad[x]);
+        //printf("%s",cad[x]);
         size_t y;
         for(y=0; y<CANT_CHAR_RENGLON && cad[x][y]!=' '; y++){
             aux3[y]=cad[x][y];
         }
-        aux3[y] = '\0';
-        //printf("%s\n",aux3);
+        aux5=y;
+        for(size_t l = 0; cad[x][y]!='\n' && cad[x][y]!='\0'; y++){
+            if(cad[x][y]==' '){
+                sint->parametros[x][l] = atof(&cad[x][y+1]);
+                //printf("El parametro leido es %f\n", sint->parametros[x][l]);
+                l++;
+            }
+            //else printf("No era espacio\n");
+        }
+        aux3[aux5]='\0';
         size_t i = 0;
         for(funmod_t z = 0; z<CANT_MODOS; z++){
-            if(strcmp(aux3,fcad[z])==0){
-                sint->p[i] = p[z]( , );
+            size_t k = strcmp(aux3,fcad[z]);
+            if(k==0){
+                sint->p[i] = p[z];
+                //printf("%s\n", fcad[z]);
                 i++;
             }
         }
-
-
     }
-    //printf("\n las funciones son: %s\n%s\n%s\n", cad[0], cad[1], cad[2]);
     fclose(archivo);
     return sint;
 }
@@ -279,36 +320,36 @@ notas_t *tomarNotas(char *nombre_mid){
 
     return notas;
 }
-
+/*
 float *tomarAmplitud(sintetizador_t *sint, notas_t *notas, size_t x){
     double tn = notas->tf[x] - notas->t0[x];
     while(tn < TIEMPO_ATAQUE){
-        notas->a *= sint->p[0];
-        return notas->a;
+        return notas->a * sint->p[0];
      }
     while(TIEMPO_ATAQUE < tn < TIEMPO_SOSTENIDO){
-        notas->a *= sint->p[1];
-        return notas->a;
+        return notas->a *= sint->p[1];
     }
     while(tn > TIEMPO_SOSTENIDO){
         notas->a *= sint->p[2];
         return notas->a;
     }
 }
+*/////modelarAmplitud(sint, notas, x)
 
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m){
     size_t x = 0;
-    tramo_t *tramo = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], modelarAmplitud(sint, notas, x), sint->v, sint->n);
+    tramo_t *tramo = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
     if(tramo == NULL) return NULL;
-    for(; x < notas->n; x++){
-        tramo_t *tramo2 = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], modelarAmplitud(sint, notas, x), sint->v, sint->n);
+        
+    for(x=1; x < notas->n; x++){
+        tramo_t *tramo2 = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
         if(tramo2 == NULL) return NULL;
-        tramo_extender(tramo, tramo2);
+        /*tramo_extender(tramo, tramo2);
         free(tramo2);
+        printf("HOLA");*/
     }
     return tramo;
 }
-
 void destruirSint(sintetizador_t *sint){
     for(size_t x = 0; x<sint->n; x++){
         free(sint->v[x]);
