@@ -103,6 +103,7 @@ sintetizador_t *tomarSint(char *nombre){
     char aux1[CANT_ARM_MAX];
     fgets(aux1, CANT_ARM_MAX, archivo);
     naux = atoi(aux1);
+    //printf("naux es%lu\n", naux);
     
     sintetizador_t *sint =malloc(sizeof(sintetizador_t));
     sint->v = (float **)malloc(naux*sizeof(float *));
@@ -338,16 +339,21 @@ float *tomarAmplitud(sintetizador_t *sint, notas_t *notas, size_t x){
 
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m){
     size_t x = 0;
-    tramo_t *tramo = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
+    double t0 = notas->t0[x];
+    double tf = notas->tf[x];
+    float f = notas->ff[x];
+    float a = notas->a[x];
+    size_t n_fa = sint->n;
+    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, sint->v, n_fa);
     if(tramo == NULL) return NULL;
         
-    for(x=1; x < notas->n; x++){
+    /*for(x=1; x < notas->n; x++){
         tramo_t *tramo2 = tramo_crear_muestreo((double)notas->t0[x], (double)notas->tf[x], f_m, (int)notas->ff[x], notas->a[x], (const float (*)[2])sint->v, sint->n);
         if(tramo2 == NULL) return NULL;
-        /*tramo_extender(tramo, tramo2);
+        tramo_extender(tramo, tramo2);
         free(tramo2);
-        printf("HOLA");*/
-    }
+        printf("HOLA");
+    }*/
     return tramo;
 }
 void destruirSint(sintetizador_t *sint){

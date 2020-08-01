@@ -29,11 +29,22 @@ int main(int argc, char* argv[]){
         destruirSint(sint);
         return 1;
     }
-
+    /*
     printf("HAY %lu NOTAS\n", notas->n);
-    /*for(size_t x=0; x<notas->n; x++){
-        //printf("t0 = %d   tf = %d   a = %d   ff = %d\n", notas->t0[x], notas->tf[x], notas->a[x], notas->ff[x]);
+    for(size_t x=0; x<notas->n; x++){
+        printf("n = %lu  t0 = %d   tf = %d   a = %d   ff = %d\n",x, notas->t0[x], notas->tf[x], notas->a[x], notas->ff[x]);
+    }
+
+    for(size_t x=0; x<sint->n; x++){
+        printf("n = %lu, a = %f\n", (size_t)sint->v[x][0], sint->v[x][1]);
+    }
+    for(size_t x=0; x<3; x++){
+        for(size_t y=0; y<3; y++){
+            printf("%f  ", sint->parametros[x][y]);
+        }
+        printf("\n");
     }*/
+    
     tramo_t *tramo = muestrearTramo(sint, notas, frec_muestreo);
     if (tramo==NULL){
         destruirNotas(notas);
