@@ -156,7 +156,7 @@ sintetizador_t *tomarSint(char *nombre){
     fclose(archivo);
     return sint;
 }
-notas_t *tomarNotas(char *nombre_mid){
+notas_t *tomarNotas(char *nombre_mid, size_t c){
     FILE *f = fopen(nombre_mid, "rb");
     if(f == NULL) {
         printf("No se pudo abrir\n");
@@ -220,7 +220,7 @@ notas_t *tomarNotas(char *nombre_mid){
                 }
                 descartar_metaevento(f, buffer[METAEVENTO_LONGITUD]);
             }
-            else if (evento == NOTA_APAGADA || (evento == NOTA_ENCENDIDA && (buffer[EVNOTA_VELOCIDAD] == 0))) {
+            else if ((evento == NOTA_APAGADA || (evento == NOTA_ENCENDIDA && (buffer[EVNOTA_VELOCIDAD] == 0)))&&canal==c) {
                 nota_t nota;
                 signed char octava;
                 if(! decodificar_nota(buffer[EVNOTA_NOTA], &nota, &octava)) {
@@ -256,7 +256,7 @@ notas_t *tomarNotas(char *nombre_mid){
                 printf("Error leyendo nota\n");
             }
             }
-            else if (evento == NOTA_ENCENDIDA) {
+            else if ((evento == NOTA_ENCENDIDA)&&canal==c) {
                 nota_t nota;
                 signed char octava;
                 if(! decodificar_nota(buffer[EVNOTA_NOTA], &nota, &octava)) {
@@ -316,20 +316,18 @@ notas_t *tomarNotas(char *nombre_mid){
     return notas;
 }
 /*
-float *tomarAmplitud(sintetizador_t *sint, notas_t *notas, size_t x){
-    double tn = notas->tf[x] - notas->t0[x];
-    while(tn < TIEMPO_ATAQUE){
-        return notas->a * sint->p[0];
-     }
-    while(TIEMPO_ATAQUE < tn < TIEMPO_SOSTENIDO){
-        return notas->a *= sint->p[1];
+float *tomarFactor(float parametros[3][3], float t, float (*p[3])(double, float[3])){
+    if(tn < TIEMPO_ATAQUE){
+        return (p[0])(t, parametros[0]);
     }
-    while(tn > TIEMPO_SOSTENIDO){
-        notas->a *= sint->p[2];
-        return notas->a;
+    if(TIEMPO_ATAQUE <= tn < TIEMPO_SOSTENIDO){
+        return (p[1])(t, parametros[1]);
     }
-}*/
-
+    if(tn >= TIEMPO_SOSTENIDO){
+        return (p[2])(t, parametros[2]);
+    }
+}
+*/
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     size_t x = 0;
     double t0 = (notas->t0[x])/(double)pps;
@@ -339,7 +337,23 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     size_t n_fa = sint->n;
     tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
     if(tramo == NULL) return NULL;
-    imprimir_muestras(tramo->v, tramo->n, t0, tramo->f_m);
+    
+    tramo_t *tramoAux = NULL;
+    for(x=1; x<notas->n; x++){
+        t0 = (notas->t0[x])/(double)pps;
+        tf = notas->tf[x]/(double)pps;
+        f = notas->ff[x];
+        a = notas->a[x];
+        
+        tramoAux = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
+        if(tramo_extender(tramo, tramoAux)==false){
+            destruirTramo(tramo);
+            destruirTramo(tramoAux);
+            return NULL;
+        }
+        free(tramoAux->v);
+    }
+    imprimir_muestras(tramo->v, tramo->n, tramo->t0, tramo->f_m);
     return tramo;
 }
 void destruirTramo(tramo_t *tramo){

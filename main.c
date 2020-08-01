@@ -14,8 +14,8 @@ int main(int argc, char* argv[]){
     char nombre_mid[255];
     char nombre_wav[255];
     size_t canal = 0;
-    int frec_muestreo = 44100;
-    int pulsos_p_segundo = 700; // todavia no nos dieron un valor por defecto a usar
+    int frec_muestreo = 400;
+    int pulsos_p_segundo = 120; // todavia no nos dieron un valor por defecto a usar
 
     bool k = tomarArgumentos(argc, argv, nombre_txt, nombre_mid, nombre_wav, &canal, &frec_muestreo, &pulsos_p_segundo);
     if (k==false) return 1;
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]){
         printf("Fallo tomarSint\n");
         return 1;
     }
-    notas_t *notas = tomarNotas(nombre_mid);
+    notas_t *notas = tomarNotas(nombre_mid, canal);
     if (notas==NULL){
         destruirSint(sint);
         return 1;
@@ -54,6 +54,7 @@ int main(int argc, char* argv[]){
         destruirNotas(notas);
         destruirSint(sint);
     }
+    printf("Notas = %lu", notas->n);
     destruirTramo(tramo);
     destruirNotas(notas);
     destruirSint(sint);

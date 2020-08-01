@@ -56,9 +56,11 @@ int tomarFrecuencia(nota_t , signed char);
 
 sintetizador_t *tomarSint(char *);
 
-notas_t *tomarNotas(char *);
+notas_t *tomarNotas(char *, size_t);
 
 tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int, int);
+
+float *tomarFactor(float[3][3], float, float (*[3])(double, float[3]));
 
 void destruirNotas(notas_t *);
 
