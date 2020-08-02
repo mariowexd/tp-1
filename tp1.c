@@ -8,9 +8,6 @@
 #include "tp1.h"
 #include "ej45.h"
 
-#define T0 = 0.05
-#define TF = 0.25
-#define PPM = 120
 
 
 char *fcad[] = {
@@ -29,7 +26,7 @@ char *fcad[] = {
     [TRI]="TRI",
     [PULSES]="PULSES"
 };
-float (*p[])(double t, float params[]) = {
+float (*z[])(double t, float params[]) = {
     [CONSTANT] = mConstant,
     [LINEAR] = mLinear,
     [INVLINEAR] = mInvlinear,
@@ -148,13 +145,10 @@ sintetizador_t *tomarSint(char *nombre){
             //else printf("No era espacio\n");
         }
         aux3[aux5]='\0';
-        size_t i = 0;
-        for(funmod_t z = 0; z<CANT_MODOS; z++){
-            size_t k = strcmp(aux3,fcad[z]);
+        for(size_t i = 0; i<CANT_MODOS; i++){
+            size_t k = strcmp(aux3,fcad[i]);
             if(k==0){
-                sint->p[i] = p[z];
-                //printf("%s\n", fcad[z]);
-                i++;
+                sint->p[x]=i;
             }
         }
     }
@@ -321,33 +315,49 @@ notas_t *tomarNotas(char *nombre_mid, size_t c){
     return notas;
 }
 
-float modularTramo(size_t *z, float params[3][3], double t0, double tf){
-    double tn = tf - t0;
+void modularTramo(size_t *p, float params[3][3], double t0, double tf, float *v, size_t n, int f_m){
+    //printf("%f\n",z[p[0]](tn, params[0]));
+
+    //printf("CONSTANT: %f\n",z[0](tn, params[0]));
+
+    //printf("LINEAR: %f\n",z[1](3, params[2])); /// 3/0.05
+
+    for(size_t x=0; x<n; x++){
+        double tn = (double)x/f_m;
+        //printf("tn = %f\n", tn);
+        if(tn < TIEMPO_ATAQUE) {
+            v[x] *= z[p[0]](tn, params[0]);
+        }
+        else if((TIEMPO_ATAQUE <= tn) && (tn < TIEMPO_SOSTENIDO)) {
+            v[x] *= z[p[1]](tn-TIEMPO_ATAQUE, params[1]);
+        }
+        else if(TIEMPO_SOSTENIDO <= tn){
+            v[x] *= z[p[2]](tn-TIEMPO_SOSTENIDO, params[2]);
+        }
+    }
         
-    while(tn < TIEMPO_ATAQUE){
-        return p[z[0]](tn, &params[0][3]);
+    /*while(tn < TIEMPO_ATAQUE){
+        return p[p[0]](tn, &params[0][3]);
     }
 
     while((TIEMPO_ATAQUE <= tn) && (tn < TIEMPO_SOSTENIDO)){
-        return p[z[1]](tn, &params[1][3]);
+        return p[p[1]](tn, &params[1][3]);
     }
 
     while(TIEMPO_SOSTENIDO < tn){
-        return p[z[2]](tn, &params[2][3]);
-    }
+        return p[p[2]](tn, &params[2][3]);
+    }*/
 }
 
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
-    //////////////////////
-    size_t z[3] = {0, 0, 3};
-    /////////////////////
     size_t x = 0;
     double t0 = (notas->t0[x])/(double)pps;
     double tf = notas->tf[x]/(double)pps;
     float f = notas->ff[x];
     float a = notas->a[x];
     size_t n_fa = sint->n;
-    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a * modularTramo(z, sint->parametros, notas->t0[x], notas->tf[x]), (const float**)sint->v, n_fa);
+    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
+    modularTramo(sint->p, sint->parametros, t0, tf, tramo->v, tramo->n, f_m);
     if(tramo == NULL) return NULL;
     
     /*for(x=1; x<3; x++){ /////for(x=1; x<notas->n; x++);
@@ -370,24 +380,6 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     }
     return tramo;
 }
-
-/*void modularTramo(tramo_t *tramo, sintetizador_t *sint, notas_t *notas){
-    size_t nT0 = T0 * tramo->f_m;
-    size_t nTF = TF * tramo->f_m;
-
-    for(size_t x=0; x<nvoid escribir_uint16_little_endian(uint16_t var, FILE *archivo){
-otas->n; x++){
-        for(size_t y = notas->t0[x]*PPM/f_m;   y<notas->t0[x]*PPM/f_m+nT0;   y++){
-            float params [3] = {notas->t0, notas->a, notas->}
-            tramo->v[x] *= p[3](y/f_m, )
-
-        }
-
-        }
-
-
-    }
-}*/
 
 /*void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
     uint16_t aux = ((var&0xff00) >> 8) + ((var&0x00ff) << 8);

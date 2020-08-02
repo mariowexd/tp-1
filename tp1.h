@@ -60,7 +60,7 @@ notas_t *tomarNotas(char *, size_t);
 
 tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int, int);
 
-//void modularTramo(tramo_t*);
+void modularTramo(size_t *, float [3][3], double, double, float *, size_t, int);
 
 void escribirWave(tramo_t *, char *, float);
 

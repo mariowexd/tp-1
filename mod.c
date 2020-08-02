@@ -14,8 +14,9 @@ float mLinear(double t, float params[3]) {
     return t/params[0];
 }
 float mInvlinear(double t, float params[3]) {
-    if (t>params[0]) return 0;
-    return 1-t/params[0];
+    float aux = 1-t/params[0];
+    if (aux>0) return aux;
+    else return 0;
 }
 float mSin(double t, float params[3]) {
     return 1+params[0]*sin(params[1]*t);
