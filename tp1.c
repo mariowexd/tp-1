@@ -8,6 +8,11 @@
 #include "tp1.h"
 #include "ej45.h"
 
+#define T0 = 0.05
+#define TF = 0.25
+#define PPM = 120
+
+
 char *fcad[] = {
     [CONSTANT]="CONSTANT",
     [LINEAR]="LINEAR",
@@ -315,19 +320,6 @@ notas_t *tomarNotas(char *nombre_mid, size_t c){
 
     return notas;
 }
-/*
-float *tomarFactor(float parametros[3][3], float t, float (*p[3])(double, float[3])){
-    if(tn < TIEMPO_ATAQUE){
-        return (p[0])(t, parametros[0]);
-    }
-    if(TIEMPO_ATAQUE <= tn < TIEMPO_SOSTENIDO){
-        return (p[1])(t, parametros[1]);
-    }
-    if(tn >= TIEMPO_SOSTENIDO){
-        return (p[2])(t, parametros[2]);
-    }
-}
-*/
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     size_t x = 0;
     double t0 = (notas->t0[x])/(double)pps;
@@ -338,29 +330,90 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
     if(tramo == NULL) return NULL;
     
-    tramo_t *tramoAux = NULL;
-    for(x=1; x<notas->n; x++){
+    for(x=1; x<3; x++){ /////for(x=1; x<notas->n; x++);
         t0 = (notas->t0[x])/(double)pps;
         tf = notas->tf[x]/(double)pps;
         f = notas->ff[x];
         a = notas->a[x];
         
-        tramoAux = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
+        tramo_t *tramoAux = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
         if(tramo_extender(tramo, tramoAux)==false){
             destruirTramo(tramo);
             destruirTramo(tramoAux);
             return NULL;
         }
-        free(tramoAux->v);
+        destruirTramo(tramoAux);
     }
-    imprimir_muestras(tramo->v, tramo->n, tramo->t0, tramo->f_m);
+
+    for(size_t x = 0; x<tramo->n; x++){
+        printf("%f,%f\n",(double)x/tramo->f_m ,tramo->v[x]);
+    }
     return tramo;
 }
+
+/*void modularTramo(tramo_t *tramo, sintetizador_t *sint, notas_t *notas){
+    size_t nT0 = T0 * tramo->f_m;
+    size_t nTF = TF * tramo->f_m;
+
+    for(size_t x=0; x<notas->n; x++){
+        for(size_t y = notas->t0[x]*PPM/f_m;   y<notas->t0[x]*PPM/f_m+nT0;   y++){
+            float params [3] = {notas->t0, notas->a, notas->}
+            tramo->v[x] *= p[3](y/f_m, )
+
+        }
+
+        }
+
+
+    }
+}*/
+
+void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
+    uint16_t aux = var&0xff00 >> 8 + var&0x00ff << 8;
+    fwrite(&aux, sizeof(uint16_t), 1, archivo);
+}
+
+uint32_t escribir_uint32_little_endian(uint32_t var, FILE *archivo){
+    uint32_t aux = var&0xff000000>>24 + var&0x00ff0000>>8 + var&0x0000ff00<<8 + var&0x000000ff<<24;
+    fwrite(&aux, sizeof(uint32_t), 1, archivo);
+}
+
+void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
+    FILE *archivo = fopen(nombre_archivo, "wb");
+    if(archivo==NULL) return 1;
+    //////////////////////////////////////////
+    fwrite("RIFF", sizeof(char), 3, archivo);
+    uint16_t aux = 36+2*tramo->n;
+    escribir_uint32_little_endian(aux, archivo);
+    fwrite("WAVE", sizeof(char), 4, archivo);
+    //////////////////////////////////////////
+    fwrite("fmt ", sizeof(char), 3, archivo);
+    escribir_uint32_little_endian(16, archivo);
+    escribir_uint16_little_endian(1, archivo);
+    escribir_uint16_little_endian(1, archivo);
+    //////////
+    escribir_uint32_little_endian(tramo->f_m, archivo);
+    escribir_uint32_little_endian(tramo->f_m*2, archivo);
+    escribir_uint16_little_endian(2, archivo);
+    escribir_uint16_little_endian(16, archivo);
+    //////////////////////////////////////////
+    fwrite("data", sizeof(char), 4, archivo);
+    escribir_uint32_little_endian(tramo->n*2);
+    for(size_t x=0; x<tramo->n; x++){
+        escribir_uint32_little_endian((uint16_t)tramo->v[x]*factor, archivo);
+    }
+
+
+
+
+
+    fclose(archivo);
+}
+
 void destruirTramo(tramo_t *tramo){
     free(tramo->v);
     free(tramo);
 }
-
 void destruirSint(sintetizador_t *sint){
     for(size_t x = 0; x<sint->n; x++){
         free(sint->v[x]);
@@ -368,7 +421,6 @@ void destruirSint(sintetizador_t *sint){
     free(sint->v);
     free(sint);
 }
-
 void destruirNotas(notas_t *notas){
     free(notas->t0);
     free(notas->tf);

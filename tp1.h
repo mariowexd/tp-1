@@ -60,11 +60,11 @@ notas_t *tomarNotas(char *, size_t);
 
 tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int, int);
 
-float *tomarFactor(float[3][3], float, float (*[3])(double, float[3]));
+//void modularTramo(tramo_t*);
 
 void destruirNotas(notas_t *);
 
-void destruirSint(sintetizador_t *);
+void destruirSint(sintetizador_t *, sintetizador_t *, notas_t *);
 
 void destruirTramo(tramo_t *);
 
