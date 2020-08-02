@@ -47,6 +47,7 @@ int main(int argc, char* argv[]){
 
 
     //printf("%lu\n",notas->n);
+    // ACA HAY QUE LLAMAR A MODULA
 
     tramo_t *tramo = muestrearTramo(sint, notas, frec_muestreo, pulsos_p_segundo);
     if (tramo==NULL){
@@ -55,10 +56,13 @@ int main(int argc, char* argv[]){
         destruirSint(sint);
     }
 
+    //escribirWawe(tramo, nombre_wav, 1);
 
-    printf("Notas = %lu", notas->n);
+    
+    //printf("Notas = %lu", notas->n);
     destruirTramo(tramo);
     destruirNotas(notas);
-    destruirSint(sint);
+    destruirSint(sint);    
+
     return 0;
 }

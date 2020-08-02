@@ -320,17 +320,37 @@ notas_t *tomarNotas(char *nombre_mid, size_t c){
 
     return notas;
 }
+
+float modularTramo(size_t *z, float params[3][3], double t0, double tf){
+    double tn = tf - t0;
+        
+    while(tn < TIEMPO_ATAQUE){
+        return p[z[0]](tn, &params[0][3]);
+    }
+
+    while((TIEMPO_ATAQUE <= tn) && (tn < TIEMPO_SOSTENIDO)){
+        return p[z[1]](tn, &params[1][3]);
+    }
+
+    while(TIEMPO_SOSTENIDO < tn){
+        return p[z[2]](tn, &params[2][3]);
+    }
+}
+
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
+    //////////////////////
+    size_t z[3] = {0, 0, 3};
+    /////////////////////
     size_t x = 0;
     double t0 = (notas->t0[x])/(double)pps;
     double tf = notas->tf[x]/(double)pps;
     float f = notas->ff[x];
     float a = notas->a[x];
     size_t n_fa = sint->n;
-    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
+    tramo_t *tramo = tramo_crear_muestreo(t0, tf, f_m, f, a * modularTramo(z, sint->parametros, notas->t0[x], notas->tf[x]), (const float**)sint->v, n_fa);
     if(tramo == NULL) return NULL;
     
-    for(x=1; x<3; x++){ /////for(x=1; x<notas->n; x++);
+    /*for(x=1; x<3; x++){ /////for(x=1; x<notas->n; x++);
         t0 = (notas->t0[x])/(double)pps;
         tf = notas->tf[x]/(double)pps;
         f = notas->ff[x];
@@ -343,7 +363,7 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
             return NULL;
         }
         destruirTramo(tramoAux);
-    }
+    }*/
 
     for(size_t x = 0; x<tramo->n; x++){
         printf("%f,%f\n",(double)x/tramo->f_m ,tramo->v[x]);
@@ -355,7 +375,8 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     size_t nT0 = T0 * tramo->f_m;
     size_t nTF = TF * tramo->f_m;
 
-    for(size_t x=0; x<notas->n; x++){
+    for(size_t x=0; x<nvoid escribir_uint16_little_endian(uint16_t var, FILE *archivo){
+otas->n; x++){
         for(size_t y = notas->t0[x]*PPM/f_m;   y<notas->t0[x]*PPM/f_m+nT0;   y++){
             float params [3] = {notas->t0, notas->a, notas->}
             tramo->v[x] *= p[3](y/f_m, )
@@ -368,19 +389,19 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     }
 }*/
 
-void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
-    uint16_t aux = var&0xff00 >> 8 + var&0x00ff << 8;
+/*void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
+    uint16_t aux = ((var&0xff00) >> 8) + ((var&0x00ff) << 8);
     fwrite(&aux, sizeof(uint16_t), 1, archivo);
 }
 
 uint32_t escribir_uint32_little_endian(uint32_t var, FILE *archivo){
-    uint32_t aux = var&0xff000000>>24 + var&0x00ff0000>>8 + var&0x0000ff00<<8 + var&0x000000ff<<24;
+    uint32_t aux = ((var&0xff000000)>>24) + ((var&0x00ff0000)>>8) + ((var&0x0000ff00)<<8) + ((var&0x000000ff)<<24);
     fwrite(&aux, sizeof(uint32_t), 1, archivo);
 }
 
 void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
     FILE *archivo = fopen(nombre_archivo, "wb");
-    if(archivo==NULL) return 1;
+    //if(archivo==NULL) return 1;
     //////////////////////////////////////////
     fwrite("RIFF", sizeof(char), 3, archivo);
     uint16_t aux = 36+2*tramo->n;
@@ -398,7 +419,7 @@ void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
     escribir_uint16_little_endian(16, archivo);
     //////////////////////////////////////////
     fwrite("data", sizeof(char), 4, archivo);
-    escribir_uint32_little_endian(tramo->n*2);
+    escribir_uint32_little_endian(tramo->n*2, archivo);
     for(size_t x=0; x<tramo->n; x++){
         escribir_uint32_little_endian((uint16_t)tramo->v[x]*factor, archivo);
     }
@@ -408,7 +429,7 @@ void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
 
 
     fclose(archivo);
-}
+}*/
 
 void destruirTramo(tramo_t *tramo){
     free(tramo->v);

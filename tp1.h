@@ -62,9 +62,11 @@ tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int, int);
 
 //void modularTramo(tramo_t*);
 
+void escribirWave(tramo_t *, char *, float);
+
 void destruirNotas(notas_t *);
 
-void destruirSint(sintetizador_t *, sintetizador_t *, notas_t *);
+void destruirSint(sintetizador_t *);
 
 void destruirTramo(tramo_t *);
 
