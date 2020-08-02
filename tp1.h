@@ -29,6 +29,8 @@
 #define TIEMPO_ATAQUE 0.05
 #define TIEMPO_SOSTENIDO 0.25
 
+#define INT_16_MAX 32768
+
 enum {EVNOTA_NOTA, EVNOTA_VELOCIDAD};
 
 enum {METAEVENTO_TIPO, METAEVENTO_LONGITUD};
@@ -62,7 +64,7 @@ tramo_t *muestrearTramo(sintetizador_t*, notas_t* , int, int);
 
 void modularTramo(size_t *, float [3][3], double, double, float *, size_t, int);
 
-void escribirWave(tramo_t *, char *, float);
+bool escribirWave(tramo_t *, char *);
 
 void destruirNotas(notas_t *);
 

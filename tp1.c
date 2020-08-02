@@ -7,7 +7,10 @@
 #include "ej3.h"
 #include "tp1.h"
 #include "ej45.h"
-
+#define MASK_0 0x000000ff
+#define MASK_1 0x0000ff00
+#define MASK_2 0x00ff0000
+#define MASK_3 0xff000000
 
 
 char *fcad[] = {
@@ -341,7 +344,7 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     modularTramo(sint->p, sint->parametros, t0, tf, tramo->v, tramo->n, f_m);
     if(tramo == NULL) return NULL;
     
-    for(x=1; x<10; x++){ /////for(x=1; x<notas->n; x++);
+    for(x=1; x<notas->n; x++){ /////for(x=1; x<notas->n; x++);
         t0 = (notas->t0[x])/(double)pps;
         tf = notas->tf[x]/(double)pps;
         f = notas->ff[x];
@@ -357,32 +360,38 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
         destruirTramo(tramoAux);
     }
 
-    for(size_t x = 0; x<tramo->n; x++){
+    /*for(size_t x = 0; x<tramo->n; x++){
         printf("%f,%f\n",(double)x/tramo->f_m ,tramo->v[x]);
-    }
+    }*/
     return tramo;
 }
 
 void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
-    uint16_t aux = ((var&0xff00) >> 8) + ((var&0x00ff) << 8);
-    fwrite(&aux, sizeof(uint16_t), 1, archivo);
+    fwrite(&var, sizeof(uint16_t), 1, archivo);
 }
 
 void escribir_uint32_little_endian(uint32_t var, FILE *archivo){
-    uint32_t aux = ((var&0xff000000)>>24) + ((var&0x00ff0000)>>8) + ((var&0x0000ff00)<<8) + ((var&0x000000ff)<<24);
-    fwrite(&aux, sizeof(uint32_t), 1, archivo);
+    fwrite(&var, sizeof(uint32_t), 1, archivo);
+
 }
 
-void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
+bool escribirWave(tramo_t * tramo, char*nombre_archivo){
+    float max = 0;
+    for(size_t x=0; x<tramo->n; x++){
+        if (tramo->v[x]>max){
+            max = tramo->v[x];
+        }
+    }
+    float factor = (float)INT_16_MAX/max;
     FILE *archivo = fopen(nombre_archivo, "wb");
-    //if(archivo==NULL) return 1;
+    if(archivo==NULL) return false;
     //////////////////////////////////////////
-    fwrite("RIFF", sizeof(char), 3, archivo);
-    uint16_t aux = 36+2*tramo->n;
+    fwrite("RIFF", sizeof(char), 4, archivo);
+    uint32_t aux = 36+2*tramo->n;
     escribir_uint32_little_endian(aux, archivo);
     fwrite("WAVE", sizeof(char), 4, archivo);
     //////////////////////////////////////////
-    fwrite("fmt ", sizeof(char), 3, archivo);
+    fwrite("fmt ", sizeof(char), 4, archivo);
     escribir_uint32_little_endian(16, archivo);
     escribir_uint16_little_endian(1, archivo);
     escribir_uint16_little_endian(1, archivo);
@@ -395,14 +404,12 @@ void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
     fwrite("data", sizeof(char), 4, archivo);
     escribir_uint32_little_endian(tramo->n*2, archivo);
     for(size_t x=0; x<tramo->n; x++){
-        escribir_uint32_little_endian((uint16_t)tramo->v[x]*factor, archivo);
+        escribir_uint16_little_endian((int16_t)tramo->v[x]*factor, archivo);
+        //printf("%d\n", (int16_t)(tramo->v[x]*factor));
     }
-
-
-
-
-
+    printf("***%lu****\n",tramo->n);
     fclose(archivo);
+    return(true);
 }
 
 void destruirTramo(tramo_t *tramo){
