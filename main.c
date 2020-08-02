@@ -56,10 +56,7 @@ int main(int argc, char* argv[]){
         destruirSint(sint);
     }
 
-    //escribirWawe(tramo, nombre_wav, 1);
-
-    
-    //printf("Notas = %lu", notas->n);
+    escribirWave(tramo, nombre_wav, 20);
     destruirTramo(tramo);
     destruirNotas(notas);
     destruirSint(sint);    

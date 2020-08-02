@@ -105,6 +105,9 @@ sintetizador_t *tomarSint(char *nombre){
     //printf("naux es%lu\n", naux);
     
     sintetizador_t *sint =malloc(sizeof(sintetizador_t));
+    sint->p[0]=0;
+    sint->p[1]=0;
+    sint->p[2]=0;
     sint->v = (float **)malloc(naux*sizeof(float *));
     for(size_t x = 0; x<naux; x++){
         sint->v[x] = (float *)malloc(2*sizeof(float));
@@ -122,7 +125,7 @@ sintetizador_t *tomarSint(char *nombre){
         sint->v[x][0] = x+1;
         sint->v[x][1] = atof(aux2+2);
     }
-    char cad[3][CANT_CHAR_MAX_MOD];
+    char cad[3][CANT_CHAR_MAX_MOD]={"                                     "};
     char aux3[CANT_CHAR_MAX_MOD];
     for(size_t x=0; x<3; x++){
     size_t aux5;
@@ -130,19 +133,16 @@ sintetizador_t *tomarSint(char *nombre){
             fclose(archivo);
             return NULL;
         }
-        //printf("%s",cad[x]);
         size_t y;
         for(y=0; y<CANT_CHAR_RENGLON && cad[x][y]!=' '; y++){
             aux3[y]=cad[x][y];
         }
-        aux5=y;
+        aux5=y;                                                    
         for(size_t l = 0; cad[x][y]!='\n' && cad[x][y]!='\0'; y++){
             if(cad[x][y]==' '){
                 sint->parametros[x][l] = atof(&cad[x][y+1]);
-                //printf("El parametro leido es %f\n", sint->parametros[x][l]);
                 l++;
             }
-            //else printf("No era espacio\n");
         }
         aux3[aux5]='\0';
         for(size_t i = 0; i<CANT_MODOS; i++){
@@ -316,15 +316,8 @@ notas_t *tomarNotas(char *nombre_mid, size_t c){
 }
 
 void modularTramo(size_t *p, float params[3][3], double t0, double tf, float *v, size_t n, int f_m){
-    //printf("%f\n",z[p[0]](tn, params[0]));
-
-    //printf("CONSTANT: %f\n",z[0](tn, params[0]));
-
-    //printf("LINEAR: %f\n",z[1](3, params[2])); /// 3/0.05
-
     for(size_t x=0; x<n; x++){
         double tn = (double)x/f_m;
-        //printf("tn = %f\n", tn);
         if(tn < TIEMPO_ATAQUE) {
             v[x] *= z[p[0]](tn, params[0]);
         }
@@ -335,18 +328,6 @@ void modularTramo(size_t *p, float params[3][3], double t0, double tf, float *v,
             v[x] *= z[p[2]](tn-TIEMPO_SOSTENIDO, params[2]);
         }
     }
-        
-    /*while(tn < TIEMPO_ATAQUE){
-        return p[p[0]](tn, &params[0][3]);
-    }
-
-    while((TIEMPO_ATAQUE <= tn) && (tn < TIEMPO_SOSTENIDO)){
-        return p[p[1]](tn, &params[1][3]);
-    }
-
-    while(TIEMPO_SOSTENIDO < tn){
-        return p[p[2]](tn, &params[2][3]);
-    }*/
 }
 
 tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
@@ -360,20 +341,21 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     modularTramo(sint->p, sint->parametros, t0, tf, tramo->v, tramo->n, f_m);
     if(tramo == NULL) return NULL;
     
-    /*for(x=1; x<3; x++){ /////for(x=1; x<notas->n; x++);
+    for(x=1; x<10; x++){ /////for(x=1; x<notas->n; x++);
         t0 = (notas->t0[x])/(double)pps;
         tf = notas->tf[x]/(double)pps;
         f = notas->ff[x];
         a = notas->a[x];
         
         tramo_t *tramoAux = tramo_crear_muestreo(t0, tf, f_m, f, a, (const float**)sint->v, n_fa);
+        modularTramo(sint->p, sint->parametros, t0, tf, tramoAux->v, tramoAux->n, f_m);
         if(tramo_extender(tramo, tramoAux)==false){
             destruirTramo(tramo);
             destruirTramo(tramoAux);
             return NULL;
         }
         destruirTramo(tramoAux);
-    }*/
+    }
 
     for(size_t x = 0; x<tramo->n; x++){
         printf("%f,%f\n",(double)x/tramo->f_m ,tramo->v[x]);
@@ -381,12 +363,12 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     return tramo;
 }
 
-/*void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
+void escribir_uint16_little_endian(uint16_t var, FILE *archivo){
     uint16_t aux = ((var&0xff00) >> 8) + ((var&0x00ff) << 8);
     fwrite(&aux, sizeof(uint16_t), 1, archivo);
 }
 
-uint32_t escribir_uint32_little_endian(uint32_t var, FILE *archivo){
+void escribir_uint32_little_endian(uint32_t var, FILE *archivo){
     uint32_t aux = ((var&0xff000000)>>24) + ((var&0x00ff0000)>>8) + ((var&0x0000ff00)<<8) + ((var&0x000000ff)<<24);
     fwrite(&aux, sizeof(uint32_t), 1, archivo);
 }
@@ -421,7 +403,7 @@ void escribirWave(tramo_t * tramo, char*nombre_archivo, float factor){
 
 
     fclose(archivo);
-}*/
+}
 
 void destruirTramo(tramo_t *tramo){
     free(tramo->v);
