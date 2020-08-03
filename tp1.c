@@ -344,7 +344,7 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
     modularTramo(sint->p, sint->parametros, t0, tf, tramo->v, tramo->n, f_m);
     if(tramo == NULL) return NULL;
     
-    for(x=1; x<notas->n; x++){ /////for(x=1; x<notas->n; x++);
+    /*for(x=1; x<notas->n; x++){ /////for(x=1; x<notas->n; x++);
         t0 = (notas->t0[x])/(double)pps;
         tf = notas->tf[x]/(double)pps;
         f = notas->ff[x];
@@ -358,11 +358,11 @@ tramo_t *muestrearTramo(sintetizador_t *sint, notas_t *notas, int f_m, int pps){
             return NULL;
         }
         destruirTramo(tramoAux);
-    }
-
-    /*for(size_t x = 0; x<tramo->n; x++){
-        printf("%f,%f\n",(double)x/tramo->f_m ,tramo->v[x]);
     }*/
+
+    for(size_t x = 0; x<tramo->n; x++){
+        printf("%f,%f\n",(double)x/tramo->f_m ,tramo->v[x]);
+    }
     return tramo;
 }
 
